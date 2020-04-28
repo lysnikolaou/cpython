@@ -19,6 +19,7 @@ from pegen.grammar import (
     Gather,
     Group,
     Rule,
+    Throw,
 )
 from pegen import grammar
 from pegen.parser_generator import dedupe, ParserGenerator
@@ -149,6 +150,9 @@ class CCallMakerVisitor(GrammarVisitor):
 
     def visit_Cut(self, node: Cut) -> Tuple[str, str]:
         return "cut_var", "1"
+
+    def visit_Throw(self, node: Throw) -> Tuple[str, str]:
+        return "throw_var", "1"
 
 
 class CParserGenerator(ParserGenerator, GrammarVisitor):
@@ -562,33 +566,40 @@ class CParserGenerator(ParserGenerator, GrammarVisitor):
             self.print("mark = p->mark;")
         self.print("}")
 
+    def handle_alt(self, node: Alt, is_loop: bool, is_gather: bool, rulename: Optional[str]):
+        # Prepare variable declarations for the alternative
+        vars = self.collect_vars(node)
+        for v, var_type in sorted(item for item in vars.items() if item[0] is not None):
+            if not var_type:
+                var_type = "void *"
+            else:
+                var_type += " "
+            if v == "cut_var":
+                v += " = 0"  # cut_var must be initialized
+            self.print(f"{var_type}{v};")
+            if v == "opt_var":
+                self.print("UNUSED(opt_var); // Silence compiler warnings")
+
+        names: List[str] = []
+        if is_loop:
+            self.handle_alt_loop(node, is_gather, rulename, names)
+        else:
+            self.handle_alt_normal(node, is_gather, names)
+
+        self.print("p->mark = mark;")
+        if "cut_var" in names:
+            self.print("if (cut_var) return NULL;")
+
     def visit_Alt(
         self, node: Alt, is_loop: bool, is_gather: bool, rulename: Optional[str]
     ) -> None:
         self.print(f"{{ // {node}")
         with self.indent():
-            # Prepare variable declarations for the alternative
-            vars = self.collect_vars(node)
-            for v, var_type in sorted(item for item in vars.items() if item[0] is not None):
-                if not var_type:
-                    var_type = "void *"
-                else:
-                    var_type += " "
-                if v == "cut_var":
-                    v += " = 0"  # cut_var must be initialized
-                self.print(f"{var_type}{v};")
-                if v == "opt_var":
-                    self.print("UNUSED(opt_var); // Silence compiler warnings")
-
-            names: List[str] = []
-            if is_loop:
-                self.handle_alt_loop(node, is_gather, rulename, names)
+            if isinstance(node.items[0].item, Throw):
+                assert len(len(node.items)) == 1
+                self.print(f"return _PyPegen_raise_label(p, {node.label});")
             else:
-                self.handle_alt_normal(node, is_gather, names)
-
-            self.print("p->mark = mark;")
-            if "cut_var" in names:
-                self.print("if (cut_var) return NULL;")
+                self.handle_alt(node, is_loop, is_gather, rulename)
         self.print("}")
 
     def collect_vars(self, node: Alt) -> Dict[str, Optional[str]]:

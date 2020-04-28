@@ -133,11 +133,12 @@ class Rule:
 
 
 class Leaf:
-    def __init__(self, value: str):
+    def __init__(self, value: str, label: str = None):
         self.value = value
+        self.label = label
 
     def __str__(self) -> str:
-        return self.value
+        return self.value if self.label == None else f"{self.value} ^ {self.label}"
 
     def __iter__(self) -> Iterable[str]:
         if False:
@@ -161,7 +162,7 @@ class NameLeaf(Leaf):
         return super().__str__()
 
     def __repr__(self) -> str:
-        return f"NameLeaf({self.value!r})"
+        return f"NameLeaf({self.value!r})" if not self.label else f"NameLeaf({self.value!r}, {self.label!r})"
 
     def nullable_visit(self, rules: Dict[str, Rule]) -> bool:
         if self.value in rules:
@@ -177,7 +178,7 @@ class StringLeaf(Leaf):
     """The value is a string literal, including quotes."""
 
     def __repr__(self) -> str:
-        return f"StringLeaf({self.value!r})"
+        return f"StringLeaf({self.value!r})" if not self.label else f"StringLeaf({self.value!r}, {self.label!r})"
 
     def nullable_visit(self, rules: Dict[str, Rule]) -> bool:
         # The string token '' is considered empty.
@@ -219,17 +220,26 @@ class Rhs:
 
 
 class Alt:
-    def __init__(self, items: List[NamedItem], *, icut: int = -1, action: Optional[str] = None):
+    def __init__(
+        self,
+        items: List[NamedItem],
+        *,
+        icut: int = -1,
+        action: Optional[str] = None,
+        labels: List[str] = None,
+    ):
         self.items = items
         self.icut = icut
         self.action = action
+        self.labels = labels
 
     def __str__(self) -> str:
         core = " ".join(str(item) for item in self.items)
+        labels = f"^ {', '.join(self.labels)} " if self.labels else ""
         if not SIMPLE_STR and self.action:
-            return f"{core} {{ {self.action} }}"
+            return f"{labels}{core} {{ {self.action} }}"
         else:
-            return core
+            return f"{labels}{core}"
 
     def __repr__(self) -> str:
         args = [repr(self.items)]
@@ -237,6 +247,8 @@ class Alt:
             args.append(f"icut={self.icut}")
         if self.action:
             args.append(f"action={self.action!r}")
+        if self.labels:
+            args.append(f"labels={self.labels!r}")
         return f"Alt({', '.join(args)})"
 
     def __iter__(self) -> Iterator[List[NamedItem]]:
@@ -452,6 +464,32 @@ class Cut:
         if not isinstance(other, Cut):
             return NotImplemented
         return True
+
+    def nullable_visit(self, rules: Dict[str, Rule]) -> bool:
+        return True
+
+    def initial_names(self) -> AbstractSet[str]:
+        return set()
+
+
+class Throw:
+    def __init__(self, label: str) -> None:
+        self.label = label
+
+    def __repr__(self) -> str:
+        return f"Throw({self.label!r})"
+
+    def __str__(self) -> str:
+        return f"^ {self.label}"
+
+    def __iter__(self) -> Iterator[Tuple[str, str]]:
+        if False:
+            yield
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Throw):
+            return NotImplemented
+        return self.label == other.label
 
     def nullable_visit(self, rules: Dict[str, Rule]) -> bool:
         return True

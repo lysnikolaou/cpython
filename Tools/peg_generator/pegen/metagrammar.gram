@@ -26,6 +26,7 @@ from pegen.grammar import (
     RuleName,
     Grammar,
     StringLeaf,
+    Throw
 )
 """
 
@@ -73,6 +74,7 @@ more_alts[Rhs]:
     | "|" alts NEWLINE { Rhs(alts.alts) }
 
 alt[Alt]:
+    | '^' '(' labels ')' alt { Alt(alt.items, action=alt.action, labels=labels) }
     | items '$' action { Alt(items + [NamedItem(None, NameLeaf('ENDMARKER'))], action=action) }
     | items '$' { Alt(items + [NamedItem(None, NameLeaf('ENDMARKER'))], action=None) }
     | items action { Alt(items, action=action) }
@@ -90,6 +92,7 @@ named_item[NamedItem]:
 lookahead[LookaheadOrCut]:
     | '&' ~ atom {PositiveLookahead(atom)}
     | '!' ~ atom {NegativeLookahead(atom)}
+    | '^' label {Throw(label)}
     | '~' {Cut()}
 
 item[Item]:
@@ -102,8 +105,16 @@ item[Item]:
 
 atom[Plain]:
     | '(' ~ alts ')' {Group(alts)}
+    | NAME '^' label {NameLeaf(name.string, label)}
     | NAME {NameLeaf(name.string) }
+    | STRING '^' label {StringLeaf(string.string, label)}
     | STRING {StringLeaf(string.string)}
+
+labels[list]:
+    | label ',' labels {[label] + labels}
+    | label {[label]}
+label[str]:
+    | NAME {name.string}
 
 # Mini-grammar for the actions
 

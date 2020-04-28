@@ -35,6 +35,7 @@ from pegen.grammar import (
     RuleName,
     Grammar,
     StringLeaf,
+    Throw
 )
 
 class GeneratedParser(Parser):
@@ -338,8 +339,23 @@ class GeneratedParser(Parser):
 
     @memoize
     def alt(self) -> Optional[Alt]:
-        # alt: items '$' action | items '$' | items action | items
+        # alt: '^' '(' labels ')' alt | items '$' action | items '$' | items action | items
         mark = self.mark()
+        cut = False
+        if (
+            (literal := self.expect('^'))
+            and
+            (literal_1 := self.expect('('))
+            and
+            (labels := self.labels())
+            and
+            (literal_2 := self.expect(')'))
+            and
+            (alt := self.alt())
+        ):
+            return Alt ( alt . items , action = alt . action , labels = labels )
+        self.reset(mark)
+        if cut: return None
         cut = False
         if (
             (items := self.items())
@@ -435,7 +451,7 @@ class GeneratedParser(Parser):
 
     @memoize
     def lookahead(self) -> Optional[LookaheadOrCut]:
-        # lookahead: '&' ~ atom | '!' ~ atom | '~'
+        # lookahead: '&' ~ atom | '!' ~ atom | '^' label | '~'
         mark = self.mark()
         cut = False
         if (
@@ -457,6 +473,15 @@ class GeneratedParser(Parser):
             (atom := self.atom())
         ):
             return NegativeLookahead ( atom )
+        self.reset(mark)
+        if cut: return None
+        cut = False
+        if (
+            (literal := self.expect('^'))
+            and
+            (label := self.label())
+        ):
+            return Throw ( label )
         self.reset(mark)
         if cut: return None
         cut = False
@@ -536,7 +561,7 @@ class GeneratedParser(Parser):
 
     @memoize
     def atom(self) -> Optional[Plain]:
-        # atom: '(' ~ alts ')' | NAME | STRING
+        # atom: '(' ~ alts ')' | NAME '^' label | NAME | STRING '^' label | STRING
         mark = self.mark()
         cut = False
         if (
@@ -554,6 +579,17 @@ class GeneratedParser(Parser):
         cut = False
         if (
             (name := self.name())
+            and
+            (literal := self.expect('^'))
+            and
+            (label := self.label())
+        ):
+            return NameLeaf ( name . string , label )
+        self.reset(mark)
+        if cut: return None
+        cut = False
+        if (
+            (name := self.name())
         ):
             return NameLeaf ( name . string )
         self.reset(mark)
@@ -561,8 +597,56 @@ class GeneratedParser(Parser):
         cut = False
         if (
             (string := self.string())
+            and
+            (literal := self.expect('^'))
+            and
+            (label := self.label())
+        ):
+            return StringLeaf ( string . string , label )
+        self.reset(mark)
+        if cut: return None
+        cut = False
+        if (
+            (string := self.string())
         ):
             return StringLeaf ( string . string )
+        self.reset(mark)
+        if cut: return None
+        return None
+
+    @memoize
+    def labels(self) -> Optional[list]:
+        # labels: label ',' labels | label
+        mark = self.mark()
+        cut = False
+        if (
+            (label := self.label())
+            and
+            (literal := self.expect(','))
+            and
+            (labels := self.labels())
+        ):
+            return [ label ] + labels
+        self.reset(mark)
+        if cut: return None
+        cut = False
+        if (
+            (label := self.label())
+        ):
+            return [ label ]
+        self.reset(mark)
+        if cut: return None
+        return None
+
+    @memoize
+    def label(self) -> Optional[str]:
+        # label: NAME
+        mark = self.mark()
+        cut = False
+        if (
+            (name := self.name())
+        ):
+            return name . string
         self.reset(mark)
         if cut: return None
         return None

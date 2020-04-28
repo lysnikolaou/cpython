@@ -86,6 +86,22 @@ class TestPegen(unittest.TestCase):
         ))
         self.assertEqual(str(rules["thing"]), "thing: NUMBER")
 
+    def test_throw_rule(self) -> None:
+        grammar = """
+        start: NAME | ^ noname
+        """
+        rules = parse_string(grammar, GrammarParser).rules
+        self.assertEqual(str(rules["start"]), "start: NAME | ^ noname")
+        self.assertTrue(repr(rules["start"]).startswith("Rule('start', None, Rhs([Alt([NamedItem(None, NameLeaf('NAME'))]), Alt([NamedItem(None, Throw('noname')"))
+
+    def test_labeled_failure(self) -> None:
+        grammar = """
+        start: NAME ^ label1 | ^ (label2, label3) STRING
+        """
+        rules = parse_string(grammar, GrammarParser).rules
+        self.assertEqual(str(rules["start"]), "start: NAME ^ label1 | ^ label2, label3 STRING")
+        self.assertTrue(repr(rules["start"]).startswith("Rule('start', None, Rhs([Alt([NamedItem(None, NameLeaf('NAME', 'label1'))]), Alt([NamedItem(None, NameLeaf('STRING'))], labels=['label2', 'label3']"))
+
     def test_expr_grammar(self) -> None:
         grammar = """
         start: sum NEWLINE

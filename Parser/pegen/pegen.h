@@ -32,6 +32,15 @@ typedef struct _memo {
 } Memo;
 
 typedef struct {
+    int error_set;
+    int label;
+    int lineno;
+    int offset;
+    int token;
+    int expected;
+} PegenErrorDetails;
+
+typedef struct {
     int type;
     PyObject *bytes;
     int lineno, col_offset, end_lineno, end_col_offset;
@@ -59,6 +68,7 @@ typedef struct {
     int starting_col_offset;
     int error_indicator;
     int flags;
+    PegenErrorDetails errors;
 } Parser;
 
 typedef struct {
@@ -129,6 +139,14 @@ void *_PyPegen_dummy_name(Parser *p, ...);
 #define EXTRA start_lineno, start_col_offset, end_lineno, end_col_offset, p->arena
 #define RAISE_SYNTAX_ERROR(msg, ...) _PyPegen_raise_error(p, PyExc_SyntaxError, msg, ##__VA_ARGS__)
 #define RAISE_INDENTATION_ERROR(msg, ...) _PyPegen_raise_error(p, PyExc_IndentationError, msg, ##__VA_ARGS__)
+#define _PyPegen_ErrorDetails_INIT \
+    (PegenErrorDetails){.error_set = 0, \
+                        .label = 0, \
+                        .lineno = 0, \
+                        .offset = 0, \
+                        .error_message = NULL, \
+                        .token = -1, \
+                        .expected = -1}
 
 Py_LOCAL_INLINE(void *)
 CHECK_CALL(Parser *p, void *result)

@@ -982,6 +982,7 @@ _PyPegen_Parser_New(struct tok_state *tok, int start_rule, int flags,
     p->starting_lineno = 0;
     p->starting_col_offset = 0;
     p->flags = flags;
+    p->errors = _PyPegen_ErrorDetails_INIT;
 
     return p;
 }
