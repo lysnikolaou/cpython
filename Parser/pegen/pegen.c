@@ -464,11 +464,20 @@ _PyPegen_insert_memo(Parser *p, int mark, int type, void *node)
 int
 _PyPegen_update_memo(Parser *p, int mark, int type, void *node)
 {
-    for (Memo *m = p->tokens[mark]->memo; m != NULL; m = m->next) {
+    Token *t = p->tokens[mark];
+    for (Memo *m = t->memo, *prev = NULL; m != NULL; prev = m, m = m->next) {
         if (m->type == type) {
             // Update existing node.
             m->node = node;
             m->mark = p->mark;
+
+            if (prev != NULL) {
+                // Delete memo from its current position
+                prev->next = m->next;
+                // And append it at the front
+                m->next = t->memo;
+                t->memo = m;
+            }
             return 0;
         }
     }
@@ -644,7 +653,6 @@ _PyPegen_fill_token(Parser *p)
 // Instrumentation to count the effectiveness of memoization.
 // The array counts the number of tokens skipped by memoization,
 // indexed by type.
-
 #define NSTATISTICS 2000
 static long memo_statistics[NSTATISTICS];
 
@@ -690,7 +698,7 @@ _PyPegen_is_memoized(Parser *p, int type, void *pres)
 
     Token *t = p->tokens[p->mark];
 
-    for (Memo *m = t->memo; m != NULL; m = m->next) {
+    for (Memo *m = t->memo, *prev = NULL; m != NULL; prev = m, m = m->next) {
         if (m->type == type) {
             if (0 <= type && type < NSTATISTICS) {
                 long count = m->mark - p->mark;
@@ -702,6 +710,14 @@ _PyPegen_is_memoized(Parser *p, int type, void *pres)
             }
             p->mark = m->mark;
             *(void **)(pres) = m->node;
+
+            if (prev != NULL) {
+                // Delete memo from its current position
+                prev->next = m->next;
+                // And append it at the front
+                m->next = t->memo;
+                t->memo = m;
+            }
             return 1;
         }
     }
