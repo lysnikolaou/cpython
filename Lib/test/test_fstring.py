@@ -10,6 +10,7 @@
 import ast
 import os
 import re
+import sys
 import types
 import decimal
 import unittest
@@ -557,6 +558,9 @@ x = (
                             r"does not match opening parenthesis '\('",
                             ["f'{a(4}'",
                             ])
+
+    @unittest.skipIf(sys.platform == 'wasi', "WASI does not support this level of nesting")
+    def test_mismatched_parens_deep_nesting(self):
         self.assertRaises(SyntaxError, eval, "f'{" + "("*500 + "}'")
 
     def test_fstring_nested_too_deeply(self):
