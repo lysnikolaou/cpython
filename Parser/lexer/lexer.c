@@ -409,7 +409,7 @@ static int
 tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct token *token)
 {
     int c;
-    int blankline, nonascii;
+    int blankline, nonascii, in_tag_string;
 
     const char *p_start = NULL;
     const char *p_end = NULL;
@@ -670,6 +670,7 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
             c = tok_nextc(tok);
             if (c == '"' || c == '\'') {
                 if (saw_f) {
+                    in_tag_string = 0;
                     goto f_string_quote;
                 }
                 goto letter_quote;
@@ -680,6 +681,10 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
                 nonascii = 1;
             }
             c = tok_nextc(tok);
+        }
+        if (c == '"' || c == '\'') {
+            in_tag_string = 1;
+            goto f_string_quote;
         }
         tok_backup(tok, c);
         if (nonascii && !verify_identifier(tok)) {
@@ -942,8 +947,11 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         return MAKE_TOKEN(NUMBER);
     }
 
+    // We may fall through here
+    in_tag_string = 0;
+
   f_string_quote:
-    if (((Py_TOLOWER(*tok->start) == 'f' || Py_TOLOWER(*tok->start) == 'r') && (c == '\'' || c == '"'))) {
+    if (((Py_TOLOWER(*tok->start) == 'f' || Py_TOLOWER(*tok->start) == 'r' || in_tag_string) && (c == '\'' || c == '"'))) {
         int quote = c;
         int quote_size = 1;             /* 1 or 3 */
 
@@ -991,17 +999,22 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         the_current_tok->last_expr_end = -1;
         the_current_tok->f_string_debug = 0;
 
-        switch (*tok->start) {
-            case 'F':
-            case 'f':
-                the_current_tok->f_string_raw = Py_TOLOWER(*(tok->start + 1)) == 'r';
-                break;
-            case 'R':
-            case 'r':
-                the_current_tok->f_string_raw = 1;
-                break;
-            default:
-                Py_UNREACHABLE();
+        if (in_tag_string) {
+            the_current_tok->f_string_raw = 1;
+        }
+        else {
+            switch (*tok->start) {
+                case 'F':
+                case 'f':
+                    the_current_tok->f_string_raw = Py_TOLOWER(*(tok->start + 1)) == 'r';
+                    break;
+                case 'R':
+                case 'r':
+                    the_current_tok->f_string_raw = 1;
+                    break;
+                default:
+                    Py_UNREACHABLE();
+            }
         }
 
         the_current_tok->curly_bracket_depth = 0;
