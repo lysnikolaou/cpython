@@ -156,6 +156,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->Sub_singleton);
     Py_CLEAR(state->Sub_type);
     Py_CLEAR(state->Subscript_type);
+    Py_CLEAR(state->TagString_type);
     Py_CLEAR(state->TryStar_type);
     Py_CLEAR(state->Try_type);
     Py_CLEAR(state->Tuple_type);
@@ -261,6 +262,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->slice);
     Py_CLEAR(state->step);
     Py_CLEAR(state->stmt_type);
+    Py_CLEAR(state->str);
     Py_CLEAR(state->subject);
     Py_CLEAR(state->tag);
     Py_CLEAR(state->target);
@@ -361,6 +363,7 @@ static int init_identifiers(struct ast_state *state)
     if ((state->simple = PyUnicode_InternFromString("simple")) == NULL) return -1;
     if ((state->slice = PyUnicode_InternFromString("slice")) == NULL) return -1;
     if ((state->step = PyUnicode_InternFromString("step")) == NULL) return -1;
+    if ((state->str = PyUnicode_InternFromString("str")) == NULL) return -1;
     if ((state->subject = PyUnicode_InternFromString("subject")) == NULL) return -1;
     if ((state->tag = PyUnicode_InternFromString("tag")) == NULL) return -1;
     if ((state->target = PyUnicode_InternFromString("target")) == NULL) return -1;
@@ -628,6 +631,10 @@ static const char * const FormattedValue_fields[]={
 };
 static const char * const JoinedStr_fields[]={
     "values",
+};
+static const char * const TagString_fields[]={
+    "tag",
+    "str",
 };
 static const char * const Constant_fields[]={
     "value",
@@ -3227,6 +3234,41 @@ add_ast_annotations(struct ast_state *state)
         return 0;
     }
     Py_DECREF(JoinedStr_annotations);
+    PyObject *TagString_annotations = PyDict_New();
+    if (!TagString_annotations) return 0;
+    {
+        PyObject *type = state->expr_type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(TagString_annotations, "tag", type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(TagString_annotations);
+            return 0;
+        }
+    }
+    {
+        PyObject *type = state->expr_type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(TagString_annotations, "str", type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(TagString_annotations);
+            return 0;
+        }
+    }
+    cond = PyObject_SetAttrString(state->TagString_type, "_field_types",
+                                  TagString_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(TagString_annotations);
+        return 0;
+    }
+    cond = PyObject_SetAttrString(state->TagString_type, "__annotations__",
+                                  TagString_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(TagString_annotations);
+        return 0;
+    }
+    Py_DECREF(TagString_annotations);
     PyObject *Constant_annotations = PyDict_New();
     if (!Constant_annotations) return 0;
     {
@@ -5778,6 +5820,7 @@ init_types(struct ast_state *state)
         "     | Call(expr func, expr* args, keyword* keywords)\n"
         "     | FormattedValue(expr value, int conversion, expr? format_spec)\n"
         "     | JoinedStr(expr* values)\n"
+        "     | TagString(expr tag, expr str)\n"
         "     | Constant(constant value, string? kind)\n"
         "     | Attribute(expr value, identifier attr, expr_context ctx)\n"
         "     | Subscript(expr value, expr slice, expr_context ctx)\n"
@@ -5876,6 +5919,10 @@ init_types(struct ast_state *state)
                                       JoinedStr_fields, 1,
         "JoinedStr(expr* values)");
     if (!state->JoinedStr_type) return -1;
+    state->TagString_type = make_type(state, "TagString", state->expr_type,
+                                      TagString_fields, 2,
+        "TagString(expr tag, expr str)");
+    if (!state->TagString_type) return -1;
     state->Constant_type = make_type(state, "Constant", state->expr_type,
                                      Constant_fields, 2,
         "Constant(constant value, string? kind)");
@@ -7567,6 +7614,34 @@ _PyAST_JoinedStr(asdl_expr_seq * values, int lineno, int col_offset, int
 }
 
 expr_ty
+_PyAST_TagString(expr_ty tag, expr_ty str, int lineno, int col_offset, int
+                 end_lineno, int end_col_offset, PyArena *arena)
+{
+    expr_ty p;
+    if (!tag) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field 'tag' is required for TagString");
+        return NULL;
+    }
+    if (!str) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field 'str' is required for TagString");
+        return NULL;
+    }
+    p = (expr_ty)_PyArena_Malloc(arena, sizeof(*p));
+    if (!p)
+        return NULL;
+    p->kind = TagString_kind;
+    p->v.TagString.tag = tag;
+    p->v.TagString.str = str;
+    p->lineno = lineno;
+    p->col_offset = col_offset;
+    p->end_lineno = end_lineno;
+    p->end_col_offset = end_col_offset;
+    return p;
+}
+
+expr_ty
 _PyAST_Constant(constant value, string kind, int lineno, int col_offset, int
                 end_lineno, int end_col_offset, PyArena *arena)
 {
@@ -9225,6 +9300,21 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
                              ast2obj_expr);
         if (!value) goto failed;
         if (PyObject_SetAttr(result, state->values, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        break;
+    case TagString_kind:
+        tp = (PyTypeObject *)state->TagString_type;
+        result = PyType_GenericNew(tp, NULL, NULL);
+        if (!result) goto failed;
+        value = ast2obj_expr(state, vstate, o->v.TagString.tag);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->tag, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_expr(state, vstate, o->v.TagString.str);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->str, value) == -1)
             goto failed;
         Py_DECREF(value);
         break;
@@ -14424,6 +14514,54 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
         if (*out == NULL) goto failed;
         return 0;
     }
+    tp = state->TagString_type;
+    isinstance = PyObject_IsInstance(obj, tp);
+    if (isinstance == -1) {
+        return -1;
+    }
+    if (isinstance) {
+        expr_ty tag;
+        expr_ty str;
+
+        if (PyObject_GetOptionalAttr(obj, state->tag, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL) {
+            PyErr_SetString(PyExc_TypeError, "required field \"tag\" missing from TagString");
+            return -1;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'TagString' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &tag, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        if (PyObject_GetOptionalAttr(obj, state->str, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL) {
+            PyErr_SetString(PyExc_TypeError, "required field \"str\" missing from TagString");
+            return -1;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'TagString' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &str, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        *out = _PyAST_TagString(tag, str, lineno, col_offset, end_lineno,
+                                end_col_offset, arena);
+        if (*out == NULL) goto failed;
+        return 0;
+    }
     tp = state->Constant_type;
     isinstance = PyObject_IsInstance(obj, tp);
     if (isinstance == -1) {
@@ -17375,6 +17513,9 @@ astmodule_exec(PyObject *m)
         return -1;
     }
     if (PyModule_AddObjectRef(m, "JoinedStr", state->JoinedStr_type) < 0) {
+        return -1;
+    }
+    if (PyModule_AddObjectRef(m, "TagString", state->TagString_type) < 0) {
         return -1;
     }
     if (PyModule_AddObjectRef(m, "Constant", state->Constant_type) < 0) {
