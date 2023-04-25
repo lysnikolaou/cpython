@@ -1621,7 +1621,6 @@ _PyPegen_concatenate_strings(Parser *p, asdl_expr_seq *strings,
     assert(len > 0);
 
     int f_string_found = 0;
-    int tag_string_found = 0;  // TODO: Do this in the grammar instead
     int unicode_string_found = 0;
     int bytes_found = 0;
 
@@ -1636,8 +1635,6 @@ _PyPegen_concatenate_strings(Parser *p, asdl_expr_seq *strings,
                 unicode_string_found = 1;
             }
             n_flattened_elements++;
-        } else if (elem->kind == TagString_kind) {
-            tag_string_found = 1;
         } else {
             assert(elem->kind == JoinedStr_kind);
             n_flattened_elements += asdl_seq_LEN(elem->v.JoinedStr.values);
@@ -1647,11 +1644,6 @@ _PyPegen_concatenate_strings(Parser *p, asdl_expr_seq *strings,
 
     if ((unicode_string_found || f_string_found) && bytes_found) {
         RAISE_SYNTAX_ERROR("cannot mix bytes and nonbytes literals");
-        return NULL;
-    }
-
-    if (tag_string_found && len > 1) {
-        RAISE_SYNTAX_ERROR("tag string cannot be joined");
         return NULL;
     }
 
