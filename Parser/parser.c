@@ -16382,6 +16382,10 @@ tagstring_rule(Parser *p)
         return NULL;
     }
     expr_ty _res = NULL;
+    if (_PyPegen_is_memoized(p, tagstring_type, &_res)) {
+        p->level--;
+        return _res;
+    }
     int _mark = p->mark;
     { // TAGSTRING_START fstring_middle* FSTRING_END
         if (p->error_indicator) {
@@ -16415,6 +16419,7 @@ tagstring_rule(Parser *p)
     }
     _res = NULL;
   done:
+    _PyPegen_insert_memo(p, _mark, tagstring_type, _res);
     p->level--;
     return _res;
 }
