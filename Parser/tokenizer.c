@@ -1889,7 +1889,7 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
             }
             c = tok_nextc(tok);
         }
-        if (c == '"' || c == '\'') {
+        if ((c == '"' || c == '\'') && !current_tok->f_string_conversion) {
             in_tag_string = 1;
             goto f_string_quote;
         }
@@ -2225,6 +2225,7 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         the_current_tok->kind = TOK_FSTRING_MODE;
         the_current_tok->f_string_quote = quote;
         the_current_tok->f_string_quote_size = quote_size;
+        the_current_tok->f_string_conversion = 0;
         the_current_tok->f_string_start = tok->start;
         the_current_tok->f_string_multi_line_start = tok->line_start;
         the_current_tok->f_string_start_offset = -1;
@@ -2368,6 +2369,10 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
             return MAKE_TOKEN(ENDMARKER);
         }
 
+        if (c != '!' && current_tok->f_string_conversion) {
+            current_tok->f_string_conversion = 0;
+        }
+
         if (c == ':' && cursor == current_tok->curly_bracket_expr_start_depth) {
             current_tok->kind = TOK_FSTRING_MODE;
             p_start = tok->start;
@@ -2469,6 +2474,10 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         char hex[9];
         (void)PyOS_snprintf(hex, sizeof(hex), "%04X", c);
         return MAKE_TOKEN(syntaxerror(tok, "invalid non-printable character U+%s", hex));
+    }
+
+    if (INSIDE_FSTRING_EXPR(current_tok) && c == '!') {
+        current_tok->f_string_conversion = 1;
     }
 
     /* Punctuation character */
