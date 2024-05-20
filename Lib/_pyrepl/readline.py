@@ -31,12 +31,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import os
-try:
-    import readline
-except ImportError:
-    readline = None
 from site import gethistoryfile   # type: ignore[attr-defined]
 import sys
+from rlcompleter import Completer as RLCompleter
 
 from . import commands, historical_reader
 from .completing_reader import CompletingReader
@@ -87,7 +84,7 @@ __all__ = [
 
 @dataclass
 class ReadlineConfig:
-    readline_completer: Completer | None = readline.get_completer() if readline is not None else None
+    readline_completer: Completer | None = RLCompleter().complete
     completer_delims: frozenset[str] = frozenset(" \t\n`~!@#$%^&*()-=+[{]}\\|;:'\",<>/?")
 
 
