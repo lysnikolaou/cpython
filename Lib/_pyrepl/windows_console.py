@@ -180,6 +180,7 @@ VK_MAP: dict[int, str] = {
 }
 
 ENABLE_PROCESSED_OUTPUT = 0x01
+ENABLE_WRAP_AT_EOL_OUTPUT = 0x02
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x04
 
 class _error(Exception):
@@ -197,7 +198,7 @@ class WindowsConsole(Console):
         encoding: str = "",
     ):
 
-        SetConsoleMode(OutHandle, ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        SetConsoleMode(OutHandle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         self.encoding = encoding or sys.getdefaultencoding()
 
         if isinstance(f_in, int):
