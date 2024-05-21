@@ -197,7 +197,6 @@ class WindowsConsole(Console):
         term: str = "",
         encoding: str = "",
     ):
-
         SetConsoleMode(OutHandle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         self.encoding = encoding or sys.getdefaultencoding()
 
