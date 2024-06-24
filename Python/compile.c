@@ -5021,8 +5021,8 @@ compiler_tag_string(struct compiler *c, expr_ty e)
                     _Py_asdl_keyword_seq_new(0, c->c_arena);
                 if (keywords == NULL)
                     return 0;
-                ADDOP(c, loc, PUSH_NULL);
                 VISIT(c, expr, tag);
+                ADDOP(c, loc, PUSH_NULL);
                 return compiler_call_helper(c, loc, 0, str->v.JoinedStr.values, keywords);
             }
         }
