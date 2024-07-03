@@ -569,12 +569,6 @@ _PyPegen_name_token(Parser *p)
     return _PyPegen_name_from_token(p, t);
 }
 
-void *
-_PyPegen_string_token(Parser *p)
-{
-    return _PyPegen_expect_token(p, STRING);
-}
-
 expr_ty _PyPegen_soft_keyword_token(Parser *p) {
     Token *t = _PyPegen_expect_token(p, NAME);
     if (t == NULL) {

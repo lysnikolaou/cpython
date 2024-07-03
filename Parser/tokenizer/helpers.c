@@ -546,7 +546,7 @@ void
 _PyTokenizer_tok_dump(int type, char *start, char *end)
 {
     fprintf(stderr, "%s", _PyParser_TokenNames[type]);
-    if (type == NAME || type == NUMBER || type == STRING || type == OP)
+    if (type == NAME || type == NUMBER || type == STRING_MIDDLE || type == STRING_START || type == OP)
         fprintf(stderr, "(%.*s)", (int)(end - start), start);
 }
 #endif

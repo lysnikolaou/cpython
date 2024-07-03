@@ -19,7 +19,7 @@ warn_invalid_escape_sequence(Parser *p, const char *first_invalid_escape, Token 
         return 0;
     }
     unsigned char c = *first_invalid_escape;
-    if ((t->type == FSTRING_MIDDLE || t->type == FSTRING_END) && (c == '{' || c == '}')) {
+    if ((t->type == STRING_MIDDLE || t->type == STRING_END) && (c == '{' || c == '}')) {
         // in this case the tokenizer has already emitted a warning,
         // see Parser/tokenizer/helpers.c:warn_invalid_escape_sequence
         return 0;
@@ -194,29 +194,37 @@ _PyPegen_decode_string(Parser *p, int raw, const char *s, size_t len, Token *t)
     (if any), and embedded escape sequences (if any). (f-strings are handled by the parser)
    _PyPegen_parse_string parses it, and returns the decoded Python string object. */
 PyObject *
-_PyPegen_parse_string(Parser *p, Token *t)
+_PyPegen_parse_string(Parser *p, Token *a, Token *b, Token *c)
 {
-    const char *s = PyBytes_AsString(t->bytes);
-    if (s == NULL) {
+    const char *first = PyBytes_AsString(a->bytes);
+    if (first == NULL) {
         return NULL;
     }
+    size_t firstquotelen = strlen(first);
 
-    size_t len;
-    int quote = Py_CHARMASK(*s);
+    const char *last = PyBytes_AsString(c->bytes);
+    if (last == NULL) {
+        return NULL;
+    }
+    size_t lastquotelen = strlen(last);
+
+    int quote = Py_CHARMASK(*first);
     int bytesmode = 0;
     int rawmode = 0;
-
     if (Py_ISALPHA(quote)) {
         while (!bytesmode || !rawmode) {
             if (quote == 'b' || quote == 'B') {
-                quote =(unsigned char)*++s;
+                quote =(unsigned char)*++first;
+                firstquotelen--;
                 bytesmode = 1;
             }
             else if (quote == 'u' || quote == 'U') {
-                quote = (unsigned char)*++s;
+                quote = (unsigned char)*++first;
+                firstquotelen--;
             }
             else if (quote == 'r' || quote == 'R') {
-                quote = (unsigned char)*++s;
+                quote = (unsigned char)*++first;
+                firstquotelen--;
                 rawmode = 1;
             }
             else {
@@ -229,49 +237,60 @@ _PyPegen_parse_string(Parser *p, Token *t)
         PyErr_BadInternalCall();
         return NULL;
     }
-    /* Skip the leading quote char. */
-    s++;
-    len = strlen(s);
-    if (len > INT_MAX) {
-        PyErr_SetString(PyExc_OverflowError, "string to parse is too long");
-        return NULL;
-    }
-    if (s[--len] != quote) {
+
+    if (*last != quote) {
         /* Last quote char must match the first. */
         PyErr_BadInternalCall();
         return NULL;
     }
-    if (len >= 4 && s[0] == quote && s[1] == quote) {
+
+    if (firstquotelen == 3 && first[1] == quote && first[2] == quote) {
         /* A triple quoted string. We've already skipped one quote at
            the start and one at the end of the string. Now skip the
            two at the start. */
-        s += 2;
-        len -= 2;
         /* And check that the last two match. */
-        if (s[--len] != quote || s[--len] != quote) {
+        if (lastquotelen == 1 || last[1] != quote || last[2] != quote) {
             PyErr_BadInternalCall();
             return NULL;
         }
     }
 
+    const char *str;
+    size_t len;
+    if (b == NULL) {
+        str = "";
+        len = 0;
+    }
+    else {
+        str = PyBytes_AsString(b->bytes);
+        if (str == NULL) {
+            return NULL;
+        }
+        len = strlen(str);
+    }
+    if (len > INT_MAX) {
+        PyErr_SetString(PyExc_OverflowError, "string to parse is too long");
+        return NULL;
+    }
+
     /* Avoid invoking escape decoding routines if possible. */
-    rawmode = rawmode || strchr(s, '\\') == NULL;
+    rawmode = rawmode || strchr(str, '\\') == NULL;
     if (bytesmode) {
         /* Disallow non-ASCII characters. */
         const char *ch;
-        for (ch = s; *ch; ch++) {
+        for (ch = str; *ch; ch++) {
             if (Py_CHARMASK(*ch) >= 0x80) {
                 RAISE_SYNTAX_ERROR_KNOWN_LOCATION(
-                                   t,
+                                   b,
                                    "bytes can only contain ASCII "
                                    "literal characters");
                 return NULL;
             }
         }
         if (rawmode) {
-            return PyBytes_FromStringAndSize(s, len);
+            return PyBytes_FromStringAndSize(str, len);
         }
-        return decode_bytes_with_escapes(p, s, len, t);
+        return decode_bytes_with_escapes(p, str, len, b);
     }
-    return _PyPegen_decode_string(p, rawmode, s, len, t);
+    return _PyPegen_decode_string(p, rawmode, str, len, b);
 }

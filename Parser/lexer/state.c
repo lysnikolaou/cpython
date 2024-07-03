@@ -53,7 +53,7 @@ _PyTokenizer_tok_new(void)
     tok->tok_extra_tokens = 0;
     tok->comment_newline = 0;
     tok->implicit_newline = 0;
-    tok->tok_mode_stack[0] = (tokenizer_mode){.kind =TOK_REGULAR_MODE, .f_string_quote='\0', .f_string_quote_size = 0, .f_string_debug=0};
+    tok->tok_mode_stack[0] = (tokenizer_mode){.kind =TOK_REGULAR_MODE, .string_quote='\0', .string_quote_size = 0, .f_string_debug=0};
     tok->tok_mode_stack_index = 0;
 #ifdef Py_DEBUG
     tok->debug = _Py_GetConfig()->parser_debug;
@@ -69,11 +69,11 @@ free_fstring_expressions(struct tok_state *tok)
 
     for (index = tok->tok_mode_stack_index; index >= 0; --index) {
         mode = &(tok->tok_mode_stack[index]);
-        if (mode->last_expr_buffer != NULL) {
-            PyMem_Free(mode->last_expr_buffer);
-            mode->last_expr_buffer = NULL;
-            mode->last_expr_size = 0;
-            mode->last_expr_end = -1;
+        if (mode->f_last_expr_buffer != NULL) {
+            PyMem_Free(mode->f_last_expr_buffer);
+            mode->f_last_expr_buffer = NULL;
+            mode->f_last_expr_size = 0;
+            mode->f_last_expr_end = -1;
         }
     }
 }

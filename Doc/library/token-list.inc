@@ -5,8 +5,6 @@
 
 .. data:: NUMBER
 
-.. data:: STRING
-
 .. data:: NEWLINE
 
 .. data:: INDENT
@@ -217,9 +215,11 @@
 
 .. data:: TAGSTRING_START
 
-.. data:: FSTRING_MIDDLE
+.. data:: STRING_START
 
-.. data:: FSTRING_END
+.. data:: STRING_MIDDLE
+
+.. data:: STRING_END
 
 .. data:: COMMENT
 

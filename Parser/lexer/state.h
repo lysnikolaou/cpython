@@ -7,8 +7,7 @@
 #define MAXLEVEL 200        /* Max parentheses level */
 #define MAXFSTRINGLEVEL 150 /* Max f-string nesting level */
 
-#define INSIDE_FSTRING(tok) (tok->tok_mode_stack_index > 0)
-#define INSIDE_FSTRING_EXPR(tok) (tok->curly_bracket_expr_start_depth >= 0)
+#define INSIDE_FSTRING_EXPR(tok) (tok->kind != TOK_STRING_MODE && tok->curly_bracket_expr_start_depth >= 0)
 
 enum decoding_state {
     STATE_INIT,
@@ -33,6 +32,7 @@ struct token {
 
 enum tokenizer_mode_kind_t {
     TOK_REGULAR_MODE,
+    TOK_STRING_MODE,
     TOK_FSTRING_MODE,
 };
 
@@ -44,20 +44,20 @@ typedef struct _tokenizer_mode {
     int curly_bracket_depth;
     int curly_bracket_expr_start_depth;
 
-    char f_string_quote;
-    int f_string_quote_size;
-    int f_string_raw;
-    const char* f_string_start;
-    const char* f_string_multi_line_start;
-    int f_string_line_start;
+    char string_quote;
+    int string_quote_size;
+    int string_raw;
+    const char* string_start;
+    const char* string_multi_line_start;
+    int string_line_start;
 
     Py_ssize_t f_string_start_offset;
     Py_ssize_t f_string_multi_line_start_offset;
-
-    Py_ssize_t last_expr_size;
-    Py_ssize_t last_expr_end;
-    char* last_expr_buffer;
+    Py_ssize_t f_last_expr_size;
+    Py_ssize_t f_last_expr_end;
+    char* f_last_expr_buffer;
     int f_string_debug;
+
 } tokenizer_mode;
 
 /* Tokenizer state */
@@ -137,5 +137,20 @@ void _PyTokenizer_Free(struct tok_state *);
 void _PyToken_Free(struct token *);
 void _PyToken_Init(struct token *);
 
+
+static inline int
+INSIDE_FSTRING(struct tok_state *tok)
+{
+    if (tok->tok_mode_stack_index == 0) {
+        return 0;
+    }
+
+    if (tok->tok_mode_stack_index == 1 &&
+            tok->tok_mode_stack[tok->tok_mode_stack_index].kind == TOK_STRING_MODE) {
+        return 0;
+    }
+
+    return 1;
+}
 
 #endif

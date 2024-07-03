@@ -147,7 +147,6 @@ Token *_PyPegen_get_last_nonnwhitespace_token(Parser *);
 int _PyPegen_fill_token(Parser *p);
 expr_ty _PyPegen_name_token(Parser *p);
 expr_ty _PyPegen_number_token(Parser *p);
-void *_PyPegen_string_token(Parser *p);
 Py_ssize_t _PyPegen_byte_offset_to_character_offset_line(PyObject *line, Py_ssize_t col_offset, Py_ssize_t end_col_offset);
 Py_ssize_t _PyPegen_byte_offset_to_character_offset(PyObject *line, Py_ssize_t col_offset);
 Py_ssize_t _PyPegen_byte_offset_to_character_offset_raw(const char*, Py_ssize_t col_offset);
@@ -331,7 +330,7 @@ expr_ty _PyPegen_collect_call_seqs(Parser *, asdl_expr_seq *, asdl_seq *,
                      int end_col_offset, PyArena *arena);
 expr_ty _PyPegen_constant_from_token(Parser* p, Token* tok);
 expr_ty _PyPegen_decoded_constant_from_token(Parser* p, Token* tok);
-expr_ty _PyPegen_constant_from_string(Parser* p, Token* tok);
+expr_ty _PyPegen_constant_from_string(Parser* p, Token *a, Token *b, Token *c);
 expr_ty _PyPegen_concatenate_strings(Parser *p, asdl_expr_seq *, int, int, int, int, PyArena *);
 expr_ty _PyPegen_FetchRawForm(Parser *p, int, int, int, int);
 expr_ty _PyPegen_ensure_imaginary(Parser *p, expr_ty);
@@ -360,7 +359,7 @@ asdl_stmt_seq *_PyPegen_interactive_exit(Parser *);
 
 // TODO: move to the correct place in this file
 expr_ty _PyPegen_joined_str(Parser *p, int is_raw, Token* a, asdl_expr_seq* expr, Token*b);
-expr_ty _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* expr, Token*b);
+expr_ty _PyPegen_tag_str(Parser *p, expr_ty tag, Token *start, asdl_expr_seq* expr, Token*b);
 
 // Generated function in parse.c - function definition in python.gram
 void *_PyPegen_parse(Parser *);
