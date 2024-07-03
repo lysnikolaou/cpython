@@ -5006,6 +5006,21 @@ compiler_joined_str(struct compiler *c, expr_ty e)
     return SUCCESS;
 }
 
+static int
+compiler_interpolation(struct compiler *c, expr_ty e)
+{
+    location loc = LOC(e);
+    asdl_expr_seq *elts = e->v.InterpolationTuple.elts;
+    assert(asdl_seq_LEN(elts) == 4);
+    assert(e->v.InterpolationTuple.ctx == Load);
+    VISIT(c, expr, asdl_seq_GET(elts, 0));
+    VISIT(c, expr, asdl_seq_GET(elts, 1));
+    VISIT(c, expr, asdl_seq_GET(elts, 2));
+    VISIT(c, expr, asdl_seq_GET(elts, 3));
+    ADDOP(c, loc, BUILD_INTERPOLATION);
+    return SUCCESS;
+}
+
 /* Used to implement tag strings */
 static int
 compiler_tag_string(struct compiler *c, expr_ty e)
@@ -6303,6 +6318,8 @@ compiler_visit_expr(struct compiler *c, expr_ty e)
         return compiler_list(c, e);
     case Tuple_kind:
         return compiler_tuple(c, e);
+    case InterpolationTuple_kind:
+        return compiler_interpolation(c, e);
     }
     return SUCCESS;
 }

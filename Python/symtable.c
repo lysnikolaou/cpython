@@ -2342,6 +2342,9 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
     case Tuple_kind:
         VISIT_SEQ(st, expr, e->v.Tuple.elts);
         break;
+    case InterpolationTuple_kind:
+        VISIT_SEQ(st, expr, e->v.InterpolationTuple.elts);
+        break;
     }
     VISIT_QUIT(st, 1);
 }

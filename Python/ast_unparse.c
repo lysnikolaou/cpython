@@ -606,8 +606,8 @@ static int
 append_interpolation(_PyUnicodeWriter *writer, expr_ty e)
 {
     APPEND_STR("{");
-    if (e->kind == Tuple_kind) {
-        asdl_expr_seq *elts = e->v.Tuple.elts;
+    if (e->kind == InterpolationTuple_kind) {
+        asdl_expr_seq *elts = e->v.InterpolationTuple.elts;
         if (asdl_seq_LEN(elts) == 4) {
             expr_ty raw = asdl_seq_GET(elts, 1);
             if (raw->kind == Constant_kind) {
@@ -643,12 +643,8 @@ append_fstring_element(_PyUnicodeWriter *writer, expr_ty e, bool is_format_spec)
     switch (e->kind) {
     case Constant_kind:
         return append_fstring_unicode(writer, e->v.Constant.value);
-    case JoinedStr_kind:
-        return append_joinedstr(writer, e, is_format_spec, false);
     case FormattedValue_kind:
         return append_formattedvalue(writer, e);
-    case Tuple_kind:
-        return append_interpolation(writer, e);
     default:
         PyErr_SetString(PyExc_SystemError,
                         "unknown expression kind inside f-string");
@@ -963,6 +959,8 @@ append_ast_expr(_PyUnicodeWriter *writer, expr_ty e, int level)
         return append_ast_list(writer, e);
     case Tuple_kind:
         return append_ast_tuple(writer, e, level);
+    case InterpolationTuple_kind:
+        return append_interpolation(writer, e);
     case NamedExpr_kind:
         return append_named_expr(writer, e, level);
     // No default so compiler emits a warning for unhandled cases

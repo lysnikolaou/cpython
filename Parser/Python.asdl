@@ -89,6 +89,7 @@ module Python
          | Name(identifier id, expr_context ctx)
          | List(expr* elts, expr_context ctx)
          | Tuple(expr* elts, expr_context ctx)
+         | InterpolationTuple(expr* elts, expr_context ctx)
 
          -- can appear only in Subscript
          | Slice(expr? lower, expr? upper, expr? step)

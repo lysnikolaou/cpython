@@ -1489,7 +1489,7 @@ _PyPegen_tag_str(Parser *p, expr_ty tag, Token *start, asdl_expr_seq* raw_expres
                 asdl_seq_SET(elts, 1, raw);
                 asdl_seq_SET(elts, 2, conv);
                 asdl_seq_SET(elts, 3, spec);
-                expr_ty tuple = _PyAST_Tuple(elts, Load,
+                expr_ty tuple = _PyAST_InterpolationTuple(elts, Load,
                         value->lineno, value->col_offset,
                         value->end_lineno, value->end_col_offset,
                         p->arena);

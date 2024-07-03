@@ -1659,6 +1659,23 @@
             break;
         }
 
+        case _BUILD_INTERPOLATION: {
+            PyObject *format_spec;
+            PyObject *conversion;
+            PyObject *raw;
+            PyObject *lambda;
+            PyObject *interpolation;
+            format_spec = stack_pointer[-1];
+            conversion = stack_pointer[-2];
+            raw = stack_pointer[-3];
+            lambda = stack_pointer[-4];
+            interpolation = _PyTagString_CreateInterpolation(lambda, raw, conversion, format_spec);
+            if (interpolation == NULL) JUMP_TO_ERROR();
+            stack_pointer[-4] = interpolation;
+            stack_pointer += -3;
+            break;
+        }
+
         case _BUILD_LIST: {
             PyObject **values;
             PyObject *list;

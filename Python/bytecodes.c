@@ -1645,6 +1645,11 @@ dummy_func(
             ERROR_IF(tup == NULL, error);
         }
 
+        inst(BUILD_INTERPOLATION, (lambda, raw, conversion, format_spec -- interpolation)) {
+            interpolation = _PyTagString_CreateInterpolation(lambda, raw, conversion, format_spec);
+            ERROR_IF(interpolation == NULL, error);
+        }
+
         inst(BUILD_LIST, (values[oparg] -- list)) {
             list = _PyList_FromArraySteal(values, oparg);
             ERROR_IF(list == NULL, error);

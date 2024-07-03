@@ -837,6 +837,14 @@
             break;
         }
 
+        case _BUILD_INTERPOLATION: {
+            _Py_UopsSymbol *interpolation;
+            interpolation = sym_new_not_null(ctx);
+            stack_pointer[-4] = interpolation;
+            stack_pointer += -3;
+            break;
+        }
+
         case _BUILD_LIST: {
             _Py_UopsSymbol *list;
             list = sym_new_not_null(ctx);

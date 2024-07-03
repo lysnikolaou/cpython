@@ -244,6 +244,9 @@ validate_expr(struct validator *state, expr_ty exp, expr_context_ty ctx)
     case Tuple_kind:
         actual_ctx = exp->v.Tuple.ctx;
         break;
+    case InterpolationTuple_kind:
+        actual_ctx = exp->v.InterpolationTuple.ctx;
+        break;
     default:
         if (ctx != Load) {
             PyErr_Format(PyExc_ValueError, "expression which can't be "
@@ -383,6 +386,9 @@ validate_expr(struct validator *state, expr_ty exp, expr_context_ty ctx)
         break;
     case Tuple_kind:
         ret = validate_exprs(state, exp->v.Tuple.elts, ctx, 0);
+        break;
+    case InterpolationTuple_kind:
+        ret = validate_exprs(state, exp->v.InterpolationTuple.elts, ctx, 0);
         break;
     case NamedExpr_kind:
         if (exp->v.NamedExpr.target->kind != Name_kind) {

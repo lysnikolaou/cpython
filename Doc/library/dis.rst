@@ -1088,6 +1088,13 @@ iterations of the loop.
       STACK.append(tuple(values))
 
 
+.. opcode:: BUILD_INTERPOLATION
+
+   Creates a named tuple to be using as the interpolation for a tag string,
+   consuming *count* items from the stack, and pushes the resulting named
+   tuple onto the stack.
+
+
 .. opcode:: BUILD_LIST (count)
 
    Works as :opcode:`BUILD_TUPLE`, but creates a list.

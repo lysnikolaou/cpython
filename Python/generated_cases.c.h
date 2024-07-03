@@ -531,6 +531,26 @@
             DISPATCH();
         }
 
+        TARGET(BUILD_INTERPOLATION) {
+            frame->instr_ptr = next_instr;
+            next_instr += 1;
+            INSTRUCTION_STATS(BUILD_INTERPOLATION);
+            PyObject *format_spec;
+            PyObject *conversion;
+            PyObject *raw;
+            PyObject *lambda;
+            PyObject *interpolation;
+            format_spec = stack_pointer[-1];
+            conversion = stack_pointer[-2];
+            raw = stack_pointer[-3];
+            lambda = stack_pointer[-4];
+            interpolation = _PyTagString_CreateInterpolation(lambda, raw, conversion, format_spec);
+            if (interpolation == NULL) goto pop_4_error;
+            stack_pointer[-4] = interpolation;
+            stack_pointer += -3;
+            DISPATCH();
+        }
+
         TARGET(BUILD_LIST) {
             frame->instr_ptr = next_instr;
             next_instr += 1;
