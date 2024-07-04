@@ -1645,8 +1645,13 @@ dummy_func(
             ERROR_IF(tup == NULL, error);
         }
 
-        inst(BUILD_INTERPOLATION, (lambda, raw, conversion, format_spec -- interpolation)) {
-            interpolation = _PyTagString_CreateInterpolation(lambda, raw, conversion, format_spec);
+        inst(BUILD_INTERPOLATION, (values[oparg] -- interpolation)) {
+            PyObject *lambda = values[0], *str = values[1], *conversion = NULL, *format_spec = NULL;
+            if (oparg == 3)
+                conversion = values[2];
+            if (oparg == 4)
+                format_spec = values[3];
+            interpolation = _PyTagString_CreateInterpolation(lambda, str, conversion, format_spec);
             ERROR_IF(interpolation == NULL, error);
         }
 

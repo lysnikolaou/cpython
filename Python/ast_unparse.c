@@ -606,32 +606,29 @@ static int
 append_interpolation(_PyUnicodeWriter *writer, expr_ty e)
 {
     APPEND_STR("{");
-    if (e->kind == InterpolationTuple_kind) {
-        asdl_expr_seq *elts = e->v.InterpolationTuple.elts;
-        if (asdl_seq_LEN(elts) == 4) {
-            expr_ty raw = asdl_seq_GET(elts, 1);
-            if (raw->kind == Constant_kind) {
-                constant c = raw->v.Constant.value;
-                if (PyUnicode_CheckExact(c)) {
-                    if (-1 == _PyUnicodeWriter_WriteStr(writer, c))
-                        return -1;
-                }
-            }
-            expr_ty conv = asdl_seq_GET(elts, 2);
-            if (conv->kind == Constant_kind) {
-                constant c = conv->v.Constant.value;
-                if (PyUnicode_CheckExact(c)) {
-                    APPEND_STR("!");
-                    if (-1 == _PyUnicodeWriter_WriteStr(writer, c))
-                        return -1;
-                }
-            }
-            expr_ty spec = asdl_seq_GET(elts, 3);
-            if (spec->kind == JoinedStr_kind) {
-                APPEND_STR(":");
-                if (-1 == append_joinedstr(writer, spec, true, false))
+    if (e->kind == Interpolation_kind) {
+        expr_ty raw = e->v.Interpolation.str;
+        if (raw->kind == Constant_kind) {
+            constant c = raw->v.Constant.value;
+            if (PyUnicode_CheckExact(c)) {
+                if (-1 == _PyUnicodeWriter_WriteStr(writer, c))
                     return -1;
             }
+        }
+        expr_ty conv = e->v.Interpolation.conversion;
+        if (conv != NULL && conv->kind == Constant_kind) {
+            constant c = conv->v.Constant.value;
+            if (PyUnicode_CheckExact(c)) {
+                APPEND_STR("!");
+                if (-1 == _PyUnicodeWriter_WriteStr(writer, c))
+                    return -1;
+            }
+        }
+        expr_ty spec = e->v.Interpolation.format_spec;
+        if (spec != NULL && spec->kind == JoinedStr_kind) {
+            APPEND_STR(":");
+            if (-1 == append_joinedstr(writer, spec, true, false))
+                return -1;
         }
     }
     APPEND_STR_FINISH("}");
@@ -959,7 +956,7 @@ append_ast_expr(_PyUnicodeWriter *writer, expr_ty e, int level)
         return append_ast_list(writer, e);
     case Tuple_kind:
         return append_ast_tuple(writer, e, level);
-    case InterpolationTuple_kind:
+    case Interpolation_kind:
         return append_interpolation(writer, e);
     case NamedExpr_kind:
         return append_named_expr(writer, e, level);

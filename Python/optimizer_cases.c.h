@@ -840,8 +840,8 @@
         case _BUILD_INTERPOLATION: {
             _Py_UopsSymbol *interpolation;
             interpolation = sym_new_not_null(ctx);
-            stack_pointer[-4] = interpolation;
-            stack_pointer += -3;
+            stack_pointer[-oparg] = interpolation;
+            stack_pointer += 1 - oparg;
             break;
         }
 

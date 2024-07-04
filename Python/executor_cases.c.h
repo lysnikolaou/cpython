@@ -1660,19 +1660,19 @@
         }
 
         case _BUILD_INTERPOLATION: {
-            PyObject *format_spec;
-            PyObject *conversion;
-            PyObject *raw;
-            PyObject *lambda;
+            PyObject **values;
             PyObject *interpolation;
-            format_spec = stack_pointer[-1];
-            conversion = stack_pointer[-2];
-            raw = stack_pointer[-3];
-            lambda = stack_pointer[-4];
-            interpolation = _PyTagString_CreateInterpolation(lambda, raw, conversion, format_spec);
+            oparg = CURRENT_OPARG();
+            values = &stack_pointer[-oparg];
+            PyObject *lambda = values[0], *str = values[1], *conversion = NULL, *format_spec = NULL;
+            if (oparg == 3)
+            conversion = values[2];
+            if (oparg == 4)
+            format_spec = values[3];
+            interpolation = _PyTagString_CreateInterpolation(lambda, str, conversion, format_spec);
             if (interpolation == NULL) JUMP_TO_ERROR();
-            stack_pointer[-4] = interpolation;
-            stack_pointer += -3;
+            stack_pointer[-oparg] = interpolation;
+            stack_pointer += 1 - oparg;
             break;
         }
 

@@ -39,8 +39,10 @@ _PyTagString_CreateInterpolation(PyObject *lambda, PyObject *raw, PyObject *conv
 
     PyStructSequence_SET_ITEM(interpolation, 0, lambda);
     PyStructSequence_SET_ITEM(interpolation, 1, raw);
-    PyStructSequence_SET_ITEM(interpolation, 2, conversion);
-    PyStructSequence_SET_ITEM(interpolation, 3, format_spec);
+    PyStructSequence_SET_ITEM(interpolation, 2,
+        conversion != NULL ? conversion : Py_NewRef(Py_None));
+    PyStructSequence_SET_ITEM(interpolation, 3,
+        format_spec != NULL ? format_spec : Py_NewRef(Py_None));
 
     _PyObject_GC_TRACK(interpolation);
     return (PyObject *)interpolation;

@@ -94,7 +94,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->In_singleton);
     Py_CLEAR(state->In_type);
     Py_CLEAR(state->Interactive_type);
-    Py_CLEAR(state->InterpolationTuple_type);
+    Py_CLEAR(state->Interpolation_type);
     Py_CLEAR(state->Invert_singleton);
     Py_CLEAR(state->Invert_type);
     Py_CLEAR(state->IsNot_singleton);
@@ -236,6 +236,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->kwd_attrs);
     Py_CLEAR(state->kwd_patterns);
     Py_CLEAR(state->kwonlyargs);
+    Py_CLEAR(state->lambda);
     Py_CLEAR(state->left);
     Py_CLEAR(state->level);
     Py_CLEAR(state->lineno);
@@ -342,6 +343,7 @@ static int init_identifiers(struct ast_state *state)
     if ((state->kwd_attrs = PyUnicode_InternFromString("kwd_attrs")) == NULL) return -1;
     if ((state->kwd_patterns = PyUnicode_InternFromString("kwd_patterns")) == NULL) return -1;
     if ((state->kwonlyargs = PyUnicode_InternFromString("kwonlyargs")) == NULL) return -1;
+    if ((state->lambda = PyUnicode_InternFromString("lambda")) == NULL) return -1;
     if ((state->left = PyUnicode_InternFromString("left")) == NULL) return -1;
     if ((state->level = PyUnicode_InternFromString("level")) == NULL) return -1;
     if ((state->lineno = PyUnicode_InternFromString("lineno")) == NULL) return -1;
@@ -637,6 +639,12 @@ static const char * const TagString_fields[]={
     "tag",
     "str",
 };
+static const char * const Interpolation_fields[]={
+    "lambda",
+    "str",
+    "conversion",
+    "format_spec",
+};
 static const char * const Constant_fields[]={
     "value",
     "kind",
@@ -664,10 +672,6 @@ static const char * const List_fields[]={
     "ctx",
 };
 static const char * const Tuple_fields[]={
-    "elts",
-    "ctx",
-};
-static const char * const InterpolationTuple_fields[]={
     "elts",
     "ctx",
 };
@@ -3274,6 +3278,75 @@ add_ast_annotations(struct ast_state *state)
         return 0;
     }
     Py_DECREF(TagString_annotations);
+    PyObject *Interpolation_annotations = PyDict_New();
+    if (!Interpolation_annotations) return 0;
+    {
+        PyObject *type = state->expr_type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(Interpolation_annotations, "lambda", type)
+                                    == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+    }
+    {
+        PyObject *type = state->expr_type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(Interpolation_annotations, "str", type) ==
+                                    0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+    }
+    {
+        PyObject *type = state->expr_type;
+        type = _Py_union_type_or(type, Py_None);
+        cond = type != NULL;
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+        cond = PyDict_SetItemString(Interpolation_annotations, "conversion",
+                                    type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+    }
+    {
+        PyObject *type = state->expr_type;
+        type = _Py_union_type_or(type, Py_None);
+        cond = type != NULL;
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+        cond = PyDict_SetItemString(Interpolation_annotations, "format_spec",
+                                    type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Interpolation_annotations);
+            return 0;
+        }
+    }
+    cond = PyObject_SetAttrString(state->Interpolation_type, "_field_types",
+                                  Interpolation_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(Interpolation_annotations);
+        return 0;
+    }
+    cond = PyObject_SetAttrString(state->Interpolation_type, "__annotations__",
+                                  Interpolation_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(Interpolation_annotations);
+        return 0;
+    }
+    Py_DECREF(Interpolation_annotations);
     PyObject *Constant_annotations = PyDict_New();
     if (!Constant_annotations) return 0;
     {
@@ -3554,50 +3627,6 @@ add_ast_annotations(struct ast_state *state)
         return 0;
     }
     Py_DECREF(Tuple_annotations);
-    PyObject *InterpolationTuple_annotations = PyDict_New();
-    if (!InterpolationTuple_annotations) return 0;
-    {
-        PyObject *type = state->expr_type;
-        type = Py_GenericAlias((PyObject *)&PyList_Type, type);
-        cond = type != NULL;
-        if (!cond) {
-            Py_DECREF(InterpolationTuple_annotations);
-            return 0;
-        }
-        cond = PyDict_SetItemString(InterpolationTuple_annotations, "elts",
-                                    type) == 0;
-        Py_DECREF(type);
-        if (!cond) {
-            Py_DECREF(InterpolationTuple_annotations);
-            return 0;
-        }
-    }
-    {
-        PyObject *type = state->expr_context_type;
-        Py_INCREF(type);
-        cond = PyDict_SetItemString(InterpolationTuple_annotations, "ctx",
-                                    type) == 0;
-        Py_DECREF(type);
-        if (!cond) {
-            Py_DECREF(InterpolationTuple_annotations);
-            return 0;
-        }
-    }
-    cond = PyObject_SetAttrString(state->InterpolationTuple_type,
-                                  "_field_types",
-                                  InterpolationTuple_annotations) == 0;
-    if (!cond) {
-        Py_DECREF(InterpolationTuple_annotations);
-        return 0;
-    }
-    cond = PyObject_SetAttrString(state->InterpolationTuple_type,
-                                  "__annotations__",
-                                  InterpolationTuple_annotations) == 0;
-    if (!cond) {
-        Py_DECREF(InterpolationTuple_annotations);
-        return 0;
-    }
-    Py_DECREF(InterpolationTuple_annotations);
     PyObject *Slice_annotations = PyDict_New();
     if (!Slice_annotations) return 0;
     {
@@ -5870,6 +5899,7 @@ init_types(struct ast_state *state)
         "     | FormattedValue(expr value, int conversion, expr? format_spec)\n"
         "     | JoinedStr(expr* values)\n"
         "     | TagString(expr tag, expr str)\n"
+        "     | Interpolation(expr lambda, expr str, expr? conversion, expr? format_spec)\n"
         "     | Constant(constant value, string? kind)\n"
         "     | Attribute(expr value, identifier attr, expr_context ctx)\n"
         "     | Subscript(expr value, expr slice, expr_context ctx)\n"
@@ -5877,7 +5907,6 @@ init_types(struct ast_state *state)
         "     | Name(identifier id, expr_context ctx)\n"
         "     | List(expr* elts, expr_context ctx)\n"
         "     | Tuple(expr* elts, expr_context ctx)\n"
-        "     | InterpolationTuple(expr* elts, expr_context ctx)\n"
         "     | Slice(expr? lower, expr? upper, expr? step)");
     if (!state->expr_type) return -1;
     if (add_attributes(state, state->expr_type, expr_attributes, 4) < 0) return
@@ -5973,6 +6002,17 @@ init_types(struct ast_state *state)
                                       TagString_fields, 2,
         "TagString(expr tag, expr str)");
     if (!state->TagString_type) return -1;
+    state->Interpolation_type = make_type(state, "Interpolation",
+                                          state->expr_type,
+                                          Interpolation_fields, 4,
+        "Interpolation(expr lambda, expr str, expr? conversion, expr? format_spec)");
+    if (!state->Interpolation_type) return -1;
+    if (PyObject_SetAttr(state->Interpolation_type, state->conversion, Py_None)
+        == -1)
+        return -1;
+    if (PyObject_SetAttr(state->Interpolation_type, state->format_spec,
+        Py_None) == -1)
+        return -1;
     state->Constant_type = make_type(state, "Constant", state->expr_type,
                                      Constant_fields, 2,
         "Constant(constant value, string? kind)");
@@ -6003,11 +6043,6 @@ init_types(struct ast_state *state)
                                   Tuple_fields, 2,
         "Tuple(expr* elts, expr_context ctx)");
     if (!state->Tuple_type) return -1;
-    state->InterpolationTuple_type = make_type(state, "InterpolationTuple",
-                                               state->expr_type,
-                                               InterpolationTuple_fields, 2,
-        "InterpolationTuple(expr* elts, expr_context ctx)");
-    if (!state->InterpolationTuple_type) return -1;
     state->Slice_type = make_type(state, "Slice", state->expr_type,
                                   Slice_fields, 3,
         "Slice(expr? lower, expr? upper, expr? step)");
@@ -7697,6 +7732,37 @@ _PyAST_TagString(expr_ty tag, expr_ty str, int lineno, int col_offset, int
 }
 
 expr_ty
+_PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion, expr_ty
+                     format_spec, int lineno, int col_offset, int end_lineno,
+                     int end_col_offset, PyArena *arena)
+{
+    expr_ty p;
+    if (!lambda) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field 'lambda' is required for Interpolation");
+        return NULL;
+    }
+    if (!str) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field 'str' is required for Interpolation");
+        return NULL;
+    }
+    p = (expr_ty)_PyArena_Malloc(arena, sizeof(*p));
+    if (!p)
+        return NULL;
+    p->kind = Interpolation_kind;
+    p->v.Interpolation.lambda = lambda;
+    p->v.Interpolation.str = str;
+    p->v.Interpolation.conversion = conversion;
+    p->v.Interpolation.format_spec = format_spec;
+    p->lineno = lineno;
+    p->col_offset = col_offset;
+    p->end_lineno = end_lineno;
+    p->end_col_offset = end_col_offset;
+    return p;
+}
+
+expr_ty
 _PyAST_Constant(constant value, string kind, int lineno, int col_offset, int
                 end_lineno, int end_col_offset, PyArena *arena)
 {
@@ -7884,30 +7950,6 @@ _PyAST_Tuple(asdl_expr_seq * elts, expr_context_ty ctx, int lineno, int
     p->kind = Tuple_kind;
     p->v.Tuple.elts = elts;
     p->v.Tuple.ctx = ctx;
-    p->lineno = lineno;
-    p->col_offset = col_offset;
-    p->end_lineno = end_lineno;
-    p->end_col_offset = end_col_offset;
-    return p;
-}
-
-expr_ty
-_PyAST_InterpolationTuple(asdl_expr_seq * elts, expr_context_ty ctx, int
-                          lineno, int col_offset, int end_lineno, int
-                          end_col_offset, PyArena *arena)
-{
-    expr_ty p;
-    if (!ctx) {
-        PyErr_SetString(PyExc_ValueError,
-                        "field 'ctx' is required for InterpolationTuple");
-        return NULL;
-    }
-    p = (expr_ty)_PyArena_Malloc(arena, sizeof(*p));
-    if (!p)
-        return NULL;
-    p->kind = InterpolationTuple_kind;
-    p->v.InterpolationTuple.elts = elts;
-    p->v.InterpolationTuple.ctx = ctx;
     p->lineno = lineno;
     p->col_offset = col_offset;
     p->end_lineno = end_lineno;
@@ -9397,6 +9439,31 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
             goto failed;
         Py_DECREF(value);
         break;
+    case Interpolation_kind:
+        tp = (PyTypeObject *)state->Interpolation_type;
+        result = PyType_GenericNew(tp, NULL, NULL);
+        if (!result) goto failed;
+        value = ast2obj_expr(state, vstate, o->v.Interpolation.lambda);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->lambda, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_expr(state, vstate, o->v.Interpolation.str);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->str, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_expr(state, vstate, o->v.Interpolation.conversion);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->conversion, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_expr(state, vstate, o->v.Interpolation.format_spec);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->format_spec, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        break;
     case Constant_kind:
         tp = (PyTypeObject *)state->Constant_type;
         result = PyType_GenericNew(tp, NULL, NULL);
@@ -9509,23 +9576,6 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
             goto failed;
         Py_DECREF(value);
         value = ast2obj_expr_context(state, vstate, o->v.Tuple.ctx);
-        if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->ctx, value) == -1)
-            goto failed;
-        Py_DECREF(value);
-        break;
-    case InterpolationTuple_kind:
-        tp = (PyTypeObject *)state->InterpolationTuple_type;
-        result = PyType_GenericNew(tp, NULL, NULL);
-        if (!result) goto failed;
-        value = ast2obj_list(state, vstate,
-                             (asdl_seq*)o->v.InterpolationTuple.elts,
-                             ast2obj_expr);
-        if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->elts, value) == -1)
-            goto failed;
-        Py_DECREF(value);
-        value = ast2obj_expr_context(state, vstate, o->v.InterpolationTuple.ctx);
         if (!value) goto failed;
         if (PyObject_SetAttr(result, state->ctx, value) == -1)
             goto failed;
@@ -14658,6 +14708,91 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
         if (*out == NULL) goto failed;
         return 0;
     }
+    tp = state->Interpolation_type;
+    isinstance = PyObject_IsInstance(obj, tp);
+    if (isinstance == -1) {
+        return -1;
+    }
+    if (isinstance) {
+        expr_ty lambda;
+        expr_ty str;
+        expr_ty conversion;
+        expr_ty format_spec;
+
+        if (PyObject_GetOptionalAttr(obj, state->lambda, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL) {
+            PyErr_SetString(PyExc_TypeError, "required field \"lambda\" missing from Interpolation");
+            return -1;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Interpolation' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &lambda, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        if (PyObject_GetOptionalAttr(obj, state->str, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL) {
+            PyErr_SetString(PyExc_TypeError, "required field \"str\" missing from Interpolation");
+            return -1;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Interpolation' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &str, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        if (PyObject_GetOptionalAttr(obj, state->conversion, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL || tmp == Py_None) {
+            Py_CLEAR(tmp);
+            conversion = NULL;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Interpolation' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &conversion, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        if (PyObject_GetOptionalAttr(obj, state->format_spec, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL || tmp == Py_None) {
+            Py_CLEAR(tmp);
+            format_spec = NULL;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Interpolation' node")) {
+                goto failed;
+            }
+            res = obj2ast_expr(state, tmp, &format_spec, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        *out = _PyAST_Interpolation(lambda, str, conversion, format_spec,
+                                    lineno, col_offset, end_lineno,
+                                    end_col_offset, arena);
+        if (*out == NULL) goto failed;
+        return 0;
+    }
     tp = state->Constant_type;
     isinstance = PyObject_IsInstance(obj, tp);
     if (isinstance == -1) {
@@ -15069,75 +15204,6 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
         }
         *out = _PyAST_Tuple(elts, ctx, lineno, col_offset, end_lineno,
                             end_col_offset, arena);
-        if (*out == NULL) goto failed;
-        return 0;
-    }
-    tp = state->InterpolationTuple_type;
-    isinstance = PyObject_IsInstance(obj, tp);
-    if (isinstance == -1) {
-        return -1;
-    }
-    if (isinstance) {
-        asdl_expr_seq* elts;
-        expr_context_ty ctx;
-
-        if (PyObject_GetOptionalAttr(obj, state->elts, &tmp) < 0) {
-            return -1;
-        }
-        if (tmp == NULL) {
-            tmp = PyList_New(0);
-            if (tmp == NULL) {
-                return -1;
-            }
-        }
-        {
-            int res;
-            Py_ssize_t len;
-            Py_ssize_t i;
-            if (!PyList_Check(tmp)) {
-                PyErr_Format(PyExc_TypeError, "InterpolationTuple field \"elts\" must be a list, not a %.200s", _PyType_Name(Py_TYPE(tmp)));
-                goto failed;
-            }
-            len = PyList_GET_SIZE(tmp);
-            elts = _Py_asdl_expr_seq_new(len, arena);
-            if (elts == NULL) goto failed;
-            for (i = 0; i < len; i++) {
-                expr_ty val;
-                PyObject *tmp2 = Py_NewRef(PyList_GET_ITEM(tmp, i));
-                if (_Py_EnterRecursiveCall(" while traversing 'InterpolationTuple' node")) {
-                    goto failed;
-                }
-                res = obj2ast_expr(state, tmp2, &val, arena);
-                _Py_LeaveRecursiveCall();
-                Py_DECREF(tmp2);
-                if (res != 0) goto failed;
-                if (len != PyList_GET_SIZE(tmp)) {
-                    PyErr_SetString(PyExc_RuntimeError, "InterpolationTuple field \"elts\" changed size during iteration");
-                    goto failed;
-                }
-                asdl_seq_SET(elts, i, val);
-            }
-            Py_CLEAR(tmp);
-        }
-        if (PyObject_GetOptionalAttr(obj, state->ctx, &tmp) < 0) {
-            return -1;
-        }
-        if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"ctx\" missing from InterpolationTuple");
-            return -1;
-        }
-        else {
-            int res;
-            if (_Py_EnterRecursiveCall(" while traversing 'InterpolationTuple' node")) {
-                goto failed;
-            }
-            res = obj2ast_expr_context(state, tmp, &ctx, arena);
-            _Py_LeaveRecursiveCall();
-            if (res != 0) goto failed;
-            Py_CLEAR(tmp);
-        }
-        *out = _PyAST_InterpolationTuple(elts, ctx, lineno, col_offset,
-                                         end_lineno, end_col_offset, arena);
         if (*out == NULL) goto failed;
         return 0;
     }
@@ -17683,6 +17749,10 @@ astmodule_exec(PyObject *m)
     if (PyModule_AddObjectRef(m, "TagString", state->TagString_type) < 0) {
         return -1;
     }
+    if (PyModule_AddObjectRef(m, "Interpolation", state->Interpolation_type) <
+        0) {
+        return -1;
+    }
     if (PyModule_AddObjectRef(m, "Constant", state->Constant_type) < 0) {
         return -1;
     }
@@ -17702,10 +17772,6 @@ astmodule_exec(PyObject *m)
         return -1;
     }
     if (PyModule_AddObjectRef(m, "Tuple", state->Tuple_type) < 0) {
-        return -1;
-    }
-    if (PyModule_AddObjectRef(m, "InterpolationTuple",
-        state->InterpolationTuple_type) < 0) {
         return -1;
     }
     if (PyModule_AddObjectRef(m, "Slice", state->Slice_type) < 0) {

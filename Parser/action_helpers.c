@@ -1434,35 +1434,31 @@ _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
         return NULL;
     }
     if (str->kind == JoinedStr_kind) {
-        // Transform FormattedValue items into thunks (for now, tuples)
         asdl_expr_seq *values = str->v.JoinedStr.values;
         int nvalues = asdl_seq_LEN(values);
-        expr_ty none = NULL;
         for (int i = 0; i < nvalues; i++) {
             expr_ty value = asdl_seq_GET(values, i);
             if (value->kind == FormattedValue_kind) {
-                if (none == NULL) {
-                    none = _PyAST_Constant(Py_None, NULL,
-                            str->lineno, str->col_offset,
-                            str->end_lineno, str->end_col_offset,
-                            p->arena);
-                    if (none == NULL)
-                        return NULL;
-                }
+
                 expr_ty expr = value->v.FormattedValue.value;
                 expr_ty lambda = lambdafy(p, expr);
-                if (lambda == NULL)
+                if (lambda == NULL) {
                     return NULL;
+                }
+
                 constant rawstr = _PyAST_ExprAsUnicode(expr);
-                if (rawstr == NULL)
+                if (rawstr == NULL) {
                     return NULL;
+                }
                 expr_ty raw = _PyAST_Constant(rawstr, NULL,
                         expr->lineno, expr->col_offset,
                         expr->end_lineno, expr->end_col_offset,
                         p->arena);
-                if (raw == NULL)
+                if (raw == NULL) {
                     return NULL;
-                expr_ty conv = none;
+                }
+
+                expr_ty conv = NULL;
                 int conversion = value->v.FormattedValue.conversion;
                 if (conversion >= 0) {
                     char buf[1];
@@ -1477,24 +1473,17 @@ _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
                     if (conv == NULL)
                         return NULL;
                 }
+
                 expr_ty spec = value->v.FormattedValue.format_spec;
-                if (spec == NULL) {
-                    spec = none;
-                }
-                asdl_expr_seq *elts = _Py_asdl_expr_seq_new(4, p->arena);
-                if (elts == NULL)
-                    return NULL;
-                asdl_seq_SET(elts, 0, lambda);
-                asdl_seq_SET(elts, 1, raw);
-                asdl_seq_SET(elts, 2, conv);
-                asdl_seq_SET(elts, 3, spec);
-                expr_ty tuple = _PyAST_InterpolationTuple(elts, Load,
+                expr_ty interpolation = _PyAST_Interpolation(lambda,
+                        raw, conv, spec,
                         value->lineno, value->col_offset,
                         value->end_lineno, value->end_col_offset,
                         p->arena);
-                if (tuple == NULL)
+                if (interpolation == NULL) {
                     return NULL;
-                asdl_seq_SET(values, i, tuple);
+                }
+                asdl_seq_SET(values, i, interpolation);
             }
         }
     }

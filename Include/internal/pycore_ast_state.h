@@ -75,7 +75,7 @@ struct ast_state {
     PyObject *In_singleton;
     PyObject *In_type;
     PyObject *Interactive_type;
-    PyObject *InterpolationTuple_type;
+    PyObject *Interpolation_type;
     PyObject *Invert_singleton;
     PyObject *Invert_type;
     PyObject *IsNot_singleton;
@@ -217,6 +217,7 @@ struct ast_state {
     PyObject *kwd_attrs;
     PyObject *kwd_patterns;
     PyObject *kwonlyargs;
+    PyObject *lambda;
     PyObject *left;
     PyObject *level;
     PyObject *lineno;

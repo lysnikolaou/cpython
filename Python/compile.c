@@ -5010,14 +5010,18 @@ static int
 compiler_interpolation(struct compiler *c, expr_ty e)
 {
     location loc = LOC(e);
-    asdl_expr_seq *elts = e->v.InterpolationTuple.elts;
-    assert(asdl_seq_LEN(elts) == 4);
-    assert(e->v.InterpolationTuple.ctx == Load);
-    VISIT(c, expr, asdl_seq_GET(elts, 0));
-    VISIT(c, expr, asdl_seq_GET(elts, 1));
-    VISIT(c, expr, asdl_seq_GET(elts, 2));
-    VISIT(c, expr, asdl_seq_GET(elts, 3));
-    ADDOP(c, loc, BUILD_INTERPOLATION);
+    int oparg = 2;
+    VISIT(c, expr, e->v.Interpolation.lambda);
+    VISIT(c, expr, e->v.Interpolation.str);
+    if (e->v.Interpolation.conversion) {
+        VISIT(c, expr, e->v.Interpolation.conversion);
+        oparg++;
+    }
+    if (e->v.Interpolation.conversion) {
+        VISIT(c, expr, e->v.Interpolation.format_spec);
+        oparg++;
+    }
+    ADDOP_I(c, loc, BUILD_INTERPOLATION, oparg);
     return SUCCESS;
 }
 
@@ -6318,7 +6322,7 @@ compiler_visit_expr(struct compiler *c, expr_ty e)
         return compiler_list(c, e);
     case Tuple_kind:
         return compiler_tuple(c, e);
-    case InterpolationTuple_kind:
+    case Interpolation_kind:
         return compiler_interpolation(c, e);
     }
     return SUCCESS;

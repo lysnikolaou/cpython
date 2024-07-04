@@ -362,9 +362,9 @@ enum _expr_kind {BoolOp_kind=1, NamedExpr_kind=2, BinOp_kind=3, UnaryOp_kind=4,
                   GeneratorExp_kind=12, Await_kind=13, Yield_kind=14,
                   YieldFrom_kind=15, Compare_kind=16, Call_kind=17,
                   FormattedValue_kind=18, JoinedStr_kind=19, TagString_kind=20,
-                  Constant_kind=21, Attribute_kind=22, Subscript_kind=23,
-                  Starred_kind=24, Name_kind=25, List_kind=26, Tuple_kind=27,
-                  InterpolationTuple_kind=28, Slice_kind=29};
+                  Interpolation_kind=21, Constant_kind=22, Attribute_kind=23,
+                  Subscript_kind=24, Starred_kind=25, Name_kind=26,
+                  List_kind=27, Tuple_kind=28, Slice_kind=29};
 struct _expr {
     enum _expr_kind kind;
     union {
@@ -470,6 +470,13 @@ struct _expr {
         } TagString;
 
         struct {
+            expr_ty lambda;
+            expr_ty str;
+            expr_ty conversion;
+            expr_ty format_spec;
+        } Interpolation;
+
+        struct {
             constant value;
             string kind;
         } Constant;
@@ -505,11 +512,6 @@ struct _expr {
             asdl_expr_seq *elts;
             expr_context_ty ctx;
         } Tuple;
-
-        struct {
-            asdl_expr_seq *elts;
-            expr_context_ty ctx;
-        } InterpolationTuple;
 
         struct {
             expr_ty lower;
@@ -835,6 +837,10 @@ expr_ty _PyAST_JoinedStr(asdl_expr_seq * values, int lineno, int col_offset,
                          int end_lineno, int end_col_offset, PyArena *arena);
 expr_ty _PyAST_TagString(expr_ty tag, expr_ty str, int lineno, int col_offset,
                          int end_lineno, int end_col_offset, PyArena *arena);
+expr_ty _PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion,
+                             expr_ty format_spec, int lineno, int col_offset,
+                             int end_lineno, int end_col_offset, PyArena
+                             *arena);
 expr_ty _PyAST_Constant(constant value, string kind, int lineno, int
                         col_offset, int end_lineno, int end_col_offset, PyArena
                         *arena);
@@ -856,9 +862,6 @@ expr_ty _PyAST_List(asdl_expr_seq * elts, expr_context_ty ctx, int lineno, int
 expr_ty _PyAST_Tuple(asdl_expr_seq * elts, expr_context_ty ctx, int lineno, int
                      col_offset, int end_lineno, int end_col_offset, PyArena
                      *arena);
-expr_ty _PyAST_InterpolationTuple(asdl_expr_seq * elts, expr_context_ty ctx,
-                                  int lineno, int col_offset, int end_lineno,
-                                  int end_col_offset, PyArena *arena);
 expr_ty _PyAST_Slice(expr_ty lower, expr_ty upper, expr_ty step, int lineno,
                      int col_offset, int end_lineno, int end_col_offset,
                      PyArena *arena);
