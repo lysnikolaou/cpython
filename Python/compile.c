@@ -5029,7 +5029,7 @@ compiler_tag_string(struct compiler *c, expr_ty e)
     if (e->kind == TagString_kind) {
         expr_ty tag = e->v.TagString.tag;
         expr_ty str = e->v.TagString.str;
-        if (tag->kind == Name_kind || tag->kind == Attribute_kind) {
+        if (tag->kind == Name_kind) {
             if (str->kind == JoinedStr_kind) {
                 // Generate code for tag(str1, str2, ...)
                 asdl_keyword_seq *keywords =

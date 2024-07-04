@@ -1332,7 +1332,7 @@ _PyPegen_joined_str(Parser *p, int is_raw, Token* a, asdl_expr_seq* raw_expressi
             }
 
             /* Tokenizer emits string parts even when the underlying string
-            might become an empty value (e.g. STRING_MIDDLE with the value \\n)
+            might become an empty value (e.g. FSTRING_MIDDLE with the value \\n)
             so we need to check for them and simplify it here. */
             if (PyUnicode_CheckExact(item->v.Constant.value)
                 && PyUnicode_GET_LENGTH(item->v.Constant.value) == 0) {
@@ -1424,13 +1424,12 @@ lambdafy(Parser *p, expr_ty arg)
 }
 
 expr_ty
-_PyPegen_tag_str(Parser *p, expr_ty tag, Token *start, asdl_expr_seq* raw_expressions, Token*b) {
-    if (tag->lineno != start->lineno || tag->end_col_offset != start->col_offset) {
-        RAISE_SYNTAX_ERROR_KNOWN_RANGE(tag, start, "Tag string must immediately follow tag name");
+_PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
+    expr_ty tag = _PyPegen_name_from_f_string_start(p, a);
+    if (tag == NULL) {
         return NULL;
     }
-
-    expr_ty str = _PyPegen_joined_str(p, 1, start, raw_expressions, b);
+    expr_ty str = _PyPegen_joined_str(p, 1, a, raw_expressions, b);
     if (str == NULL) {
         return NULL;
     }
@@ -1499,7 +1498,7 @@ _PyPegen_tag_str(Parser *p, expr_ty tag, Token *start, asdl_expr_seq* raw_expres
             }
         }
     }
-    return _PyAST_TagString(tag, str, tag->lineno, tag->col_offset,
+    return _PyAST_TagString(tag, str, a->lineno, a->col_offset,
                             b->end_lineno, b->end_col_offset,
                             p->arena);
 }
@@ -1522,8 +1521,12 @@ expr_ty _PyPegen_constant_from_token(Parser* p, Token* tok) {
                            p->arena);
 }
 
-expr_ty _PyPegen_constant_from_string(Parser* p, Token *a, Token *b, Token *c) {
-    PyObject *s = _PyPegen_parse_string(p, a, b, c);
+expr_ty _PyPegen_constant_from_string(Parser* p, Token* tok) {
+    char* the_str = PyBytes_AsString(tok->bytes);
+    if (the_str == NULL) {
+        return NULL;
+    }
+    PyObject *s = _PyPegen_parse_string(p, tok);
     if (s == NULL) {
         _Pypegen_raise_decode_error(p);
         return NULL;
@@ -1532,21 +1535,14 @@ expr_ty _PyPegen_constant_from_string(Parser* p, Token *a, Token *b, Token *c) {
         Py_DECREF(s);
         return NULL;
     }
-
-    char *open_quote = PyBytes_AsString(a->bytes);
-    if (open_quote == NULL) {
-        return NULL;
-    }
-
     PyObject *kind = NULL;
-    if (open_quote[0] == 'u') {
+    if (the_str && the_str[0] == 'u') {
         kind = _PyPegen_new_identifier(p, "u");
         if (kind == NULL) {
             return NULL;
         }
     }
-
-    return _PyAST_Constant(s, kind, a->lineno, a->col_offset, c->end_lineno, c->end_col_offset, p->arena);
+    return _PyAST_Constant(s, kind, tok->lineno, tok->col_offset, tok->end_lineno, tok->end_col_offset, p->arena);
 }
 
 expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, ResultTokenWithMetadata *conversion,

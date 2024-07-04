@@ -231,10 +231,6 @@ dotted_name[expr_ty]:
     | a=dotted_name '.' b=NAME { _PyPegen_join_names_with_dot(p, a, b) }
     | NAME
 
-dotted_name_attr[expr_ty]:
-    | a=dotted_name_attr '.' b=NAME { _PyAST_Attribute(a, b->v.Name.id, Load, EXTRA) }
-    | NAME
-
 # COMPOUND STATEMENTS
 # ===================
 
@@ -840,12 +836,12 @@ slice[expr_ty]:
     | a=named_expression { a }
 
 atom[expr_ty]:
-    | &NAME tagstring
     | NAME
     | 'True' { _PyAST_Constant(Py_True, NULL, EXTRA) }
     | 'False' { _PyAST_Constant(Py_False, NULL, EXTRA) }
     | 'None' { _PyAST_Constant(Py_None, NULL, EXTRA) }
-    | &(STRING_START|FSTRING_START) strings
+    | &(STRING|FSTRING_START) strings
+    | &TAGSTRING_START tagstring
     | NUMBER
     | &'(' (tuple | group | genexp)
     | &'[' (list | listcomp)
@@ -917,7 +913,7 @@ lambda_param[arg_ty]: a=NAME { _PyAST_arg(a->v.Name.id, NULL, NULL, EXTRA) }
 
 fstring_middle[expr_ty]:
     | fstring_replacement_field
-    | t=STRING_MIDDLE { _PyPegen_constant_from_token(p, t) }
+    | t=FSTRING_MIDDLE { _PyPegen_constant_from_token(p, t) }
 fstring_replacement_field[expr_ty]:
     | '{' a=annotated_rhs debug_expr='='? conversion=[fstring_conversion] format=[fstring_full_format_spec] rbrace='}' {
         _PyPegen_formatted_value(p, a, debug_expr, conversion, format, rbrace, EXTRA) }
@@ -927,15 +923,14 @@ fstring_conversion[ResultTokenWithMetadata*]:
 fstring_full_format_spec[ResultTokenWithMetadata*]:
     | colon=':' spec=fstring_format_spec* { _PyPegen_setup_full_format_spec(p, colon, (asdl_expr_seq *) spec, EXTRA) }
 fstring_format_spec[expr_ty]:
-    | t=STRING_MIDDLE { _PyPegen_decoded_constant_from_token(p, t) }
+    | t=FSTRING_MIDDLE { _PyPegen_decoded_constant_from_token(p, t) }
     | fstring_replacement_field
-
 fstring[expr_ty]:
-    | a=FSTRING_START b=fstring_middle* c=STRING_END { _PyPegen_joined_str(p, 0, a, (asdl_expr_seq*)b, c) }
+    | a=FSTRING_START b=fstring_middle* c=FSTRING_END { _PyPegen_joined_str(p, 0, a, (asdl_expr_seq*)b, c) }
 tagstring[expr_ty] (memo):
-    | a=dotted_name_attr b=TAGSTRING_START c=fstring_middle* d=STRING_END { _PyPegen_tag_str(p, a, b, (asdl_expr_seq*)c, d) }
-string[expr_ty]: a=STRING_START b=[STRING_MIDDLE] c=STRING_END { _PyPegen_constant_from_string(p, a, b, c) }
+    | a=TAGSTRING_START b=fstring_middle* c=FSTRING_END { _PyPegen_tag_str(p, a, (asdl_expr_seq*)b, c) }
 
+string[expr_ty]: s[Token*]=STRING { _PyPegen_constant_from_string(p, s) }
 strings[expr_ty] (memo): a[asdl_expr_seq*]=(fstring|string)+ { _PyPegen_concatenate_strings(p, a, EXTRA) }
 
 list[expr_ty]:
@@ -1186,13 +1181,13 @@ invalid_type_param:
         }
 
 invalid_expression:
-    # !(NAME STRING_START) is not matched so we don't show this error with some invalid string prefixes like: kf"dsfsdf"
+    # !(NAME STRING) is not matched so we don't show this error with some invalid string prefixes like: kf"dsfsdf"
     # Soft keywords need to also be ignored because they can be parsed as NAME NAME
-   | !(NAME STRING_START | SOFT_KEYWORD) a=disjunction b=expression_without_invalid {
+   | !(NAME STRING | SOFT_KEYWORD) a=disjunction b=expression_without_invalid {
         _PyPegen_check_legacy_stmt(p, a) ? NULL : p->tokens[p->mark-1]->level == 0 ? NULL :
         RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "invalid syntax. Perhaps you forgot a comma?") }
    | a=disjunction 'if' b=disjunction !('else'|':') { RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "expected 'else' after 'if' expression") }
-   | a='lambda' [lambda_params] b=':' &STRING_MIDDLE  {
+   | a='lambda' [lambda_params] b=':' &FSTRING_MIDDLE  {
         RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "f-string: lambda expressions are not allowed without parentheses") }
 
 invalid_named_expression(memo):

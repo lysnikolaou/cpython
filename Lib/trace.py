@@ -363,18 +363,12 @@ def _find_strings(filename, encoding=None):
     # Add this special case so that the test in the loop passes.
     prev_ttype = token.INDENT
     with open(filename, encoding=encoding) as f:
-        tok = list(tokenize.generate_tokens(f.readline))
-        l = len(tok)
-        for i, (ttype, tstr, start, end, line) in enumerate(tok):
-            if ttype == token.STRING_START:
-                if (
-                    prev_ttype == token.INDENT and
-                    i + 1 < l and tok[i + 1].type == token.STRING_MIDDLE and
-                    i + 2 < l and tok[i + 2].type == token.STRING_END
-                ):
-                    
+        tok = tokenize.generate_tokens(f.readline)
+        for ttype, tstr, start, end, line in tok:
+            if ttype == token.STRING:
+                if prev_ttype == token.INDENT:
                     sline, scol = start
-                    eline, ecol = tok[i + 2].end
+                    eline, ecol = end
                     for i in range(sline, eline + 1):
                         d[i] = 1
             prev_ttype = ttype

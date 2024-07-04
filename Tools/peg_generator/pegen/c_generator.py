@@ -67,6 +67,7 @@ _PyPegen_parse(Parser *p)
 class NodeTypes(Enum):
     NAME_TOKEN = 0
     NUMBER_TOKEN = 1
+    STRING_TOKEN = 2
     GENERIC_TOKEN = 3
     KEYWORD = 4
     SOFT_KEYWORD = 5
@@ -77,6 +78,7 @@ class NodeTypes(Enum):
 BASE_NODETYPES = {
     "NAME": NodeTypes.NAME_TOKEN,
     "NUMBER": NodeTypes.NUMBER_TOKEN,
+    "STRING": NodeTypes.STRING_TOKEN,
     "SOFT_KEYWORD": NodeTypes.SOFT_KEYWORD,
 }
 

@@ -236,14 +236,14 @@ class Untokenizer:
                     self.tokens.append(indent)
                     self.prev_col = len(indent)
                 startline = False
-            elif tok_type == STRING_MIDDLE:
+            elif tok_type == FSTRING_MIDDLE:
                 if '{' in token or '}' in token:
                     token = self.escape_brackets(token)
                     last_line = token.splitlines()[-1]
                     end_line, end_col = end
                     extra_chars = last_line.count("{{") + last_line.count("}}")
                     end = (end_line, end_col + extra_chars)
-            elif tok_type in (STRING, FSTRING_START) and self.prev_type in (STRING, STRING_END):
+            elif tok_type in (STRING, FSTRING_START) and self.prev_type in (STRING, FSTRING_END):
                 self.tokens.append(" ")
 
             self.add_whitespace(start)
@@ -281,7 +281,7 @@ class Untokenizer:
 
             if toknum == FSTRING_START:
                 in_fstring += 1
-            elif toknum == STRING_END:
+            elif toknum == FSTRING_END:
                 in_fstring -= 1
             if toknum == INDENT:
                 indents.append(tokval)
@@ -294,7 +294,7 @@ class Untokenizer:
             elif startline and indents:
                 toks_append(indents[-1])
                 startline = False
-            elif toknum == STRING_MIDDLE:
+            elif toknum == FSTRING_MIDDLE:
                 tokval = self.escape_brackets(tokval)
 
             # Insert a space between two consecutive brackets if we are in an f-string
@@ -302,7 +302,7 @@ class Untokenizer:
                 tokval = ' ' + tokval
 
             # Insert a space between two consecutive f-strings
-            if toknum in (STRING, FSTRING_START) and self.prev_type in (STRING, STRING_END):
+            if toknum in (STRING, FSTRING_START) and self.prev_type in (STRING, FSTRING_END):
                 self.tokens.append(" ")
 
             toks_append(tokval)

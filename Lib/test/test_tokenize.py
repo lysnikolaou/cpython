@@ -441,40 +441,40 @@ c"""', """\
     """)
         self.check_tokenize('f"abc"', """\
     FSTRING_START 'f"'          (1, 0) (1, 2)
-    STRING_MIDDLE 'abc'         (1, 2) (1, 5)
-    STRING_END '"'           (1, 5) (1, 6)
+    FSTRING_MIDDLE 'abc'         (1, 2) (1, 5)
+    FSTRING_END '"'           (1, 5) (1, 6)
     """)
         self.check_tokenize('fR"a{b}c"', """\
     FSTRING_START 'fR"'         (1, 0) (1, 3)
-    STRING_MIDDLE 'a'           (1, 3) (1, 4)
+    FSTRING_MIDDLE 'a'           (1, 3) (1, 4)
     OP         '{'           (1, 4) (1, 5)
     NAME       'b'           (1, 5) (1, 6)
     OP         '}'           (1, 6) (1, 7)
-    STRING_MIDDLE 'c'           (1, 7) (1, 8)
-    STRING_END '"'           (1, 8) (1, 9)
+    FSTRING_MIDDLE 'c'           (1, 7) (1, 8)
+    FSTRING_END '"'           (1, 8) (1, 9)
     """)
         self.check_tokenize('fR"a{{{b!r}}}c"', """\
     FSTRING_START 'fR"'         (1, 0) (1, 3)
-    STRING_MIDDLE 'a{'          (1, 3) (1, 5)
+    FSTRING_MIDDLE 'a{'          (1, 3) (1, 5)
     OP         '{'           (1, 6) (1, 7)
     NAME       'b'           (1, 7) (1, 8)
     OP         '!'           (1, 8) (1, 9)
     NAME       'r'           (1, 9) (1, 10)
     OP         '}'           (1, 10) (1, 11)
-    STRING_MIDDLE '}'           (1, 11) (1, 12)
-    STRING_MIDDLE 'c'           (1, 13) (1, 14)
-    STRING_END '"'           (1, 14) (1, 15)
+    FSTRING_MIDDLE '}'           (1, 11) (1, 12)
+    FSTRING_MIDDLE 'c'           (1, 13) (1, 14)
+    FSTRING_END '"'           (1, 14) (1, 15)
     """)
         self.check_tokenize('f"{{{1+1}}}"', """\
     FSTRING_START 'f"'          (1, 0) (1, 2)
-    STRING_MIDDLE '{'           (1, 2) (1, 3)
+    FSTRING_MIDDLE '{'           (1, 2) (1, 3)
     OP         '{'           (1, 4) (1, 5)
     NUMBER     '1'           (1, 5) (1, 6)
     OP         '+'           (1, 6) (1, 7)
     NUMBER     '1'           (1, 7) (1, 8)
     OP         '}'           (1, 8) (1, 9)
-    STRING_MIDDLE '}'           (1, 9) (1, 10)
-    STRING_END '"'           (1, 11) (1, 12)
+    FSTRING_MIDDLE '}'           (1, 9) (1, 10)
+    FSTRING_END '"'           (1, 11) (1, 12)
     """)
         self.check_tokenize('f"""{f\'\'\'{f\'{f"{1+1}"}\'}\'\'\'}"""', """\
     FSTRING_START 'f\"""'        (1, 0) (1, 4)
@@ -489,70 +489,70 @@ c"""', """\
     OP         '+'           (1, 17) (1, 18)
     NUMBER     '1'           (1, 18) (1, 19)
     OP         '}'           (1, 19) (1, 20)
-    STRING_END '"'           (1, 20) (1, 21)
+    FSTRING_END '"'           (1, 20) (1, 21)
     OP         '}'           (1, 21) (1, 22)
-    STRING_END "'"           (1, 22) (1, 23)
+    FSTRING_END "'"           (1, 22) (1, 23)
     OP         '}'           (1, 23) (1, 24)
-    STRING_END "'''"         (1, 24) (1, 27)
+    FSTRING_END "'''"         (1, 24) (1, 27)
     OP         '}'           (1, 27) (1, 28)
-    STRING_END '\"""'         (1, 28) (1, 31)
+    FSTRING_END '\"""'         (1, 28) (1, 31)
     """)
         self.check_tokenize('f"""     x\nstr(data, encoding={invalid!r})\n"""', """\
     FSTRING_START 'f\"""'        (1, 0) (1, 4)
-    STRING_MIDDLE '     x\\nstr(data, encoding=' (1, 4) (2, 19)
+    FSTRING_MIDDLE '     x\\nstr(data, encoding=' (1, 4) (2, 19)
     OP         '{'           (2, 19) (2, 20)
     NAME       'invalid'     (2, 20) (2, 27)
     OP         '!'           (2, 27) (2, 28)
     NAME       'r'           (2, 28) (2, 29)
     OP         '}'           (2, 29) (2, 30)
-    STRING_MIDDLE ')\\n'         (2, 30) (3, 0)
-    STRING_END '\"""'         (3, 0) (3, 3)
+    FSTRING_MIDDLE ')\\n'         (2, 30) (3, 0)
+    FSTRING_END '\"""'         (3, 0) (3, 3)
     """)
         self.check_tokenize('f"""123456789\nsomething{None}bad"""', """\
     FSTRING_START 'f\"""'        (1, 0) (1, 4)
-    STRING_MIDDLE '123456789\\nsomething' (1, 4) (2, 9)
+    FSTRING_MIDDLE '123456789\\nsomething' (1, 4) (2, 9)
     OP         '{'           (2, 9) (2, 10)
     NAME       'None'        (2, 10) (2, 14)
     OP         '}'           (2, 14) (2, 15)
-    STRING_MIDDLE 'bad'         (2, 15) (2, 18)
-    STRING_END '\"""'         (2, 18) (2, 21)
+    FSTRING_MIDDLE 'bad'         (2, 15) (2, 18)
+    FSTRING_END '\"""'         (2, 18) (2, 21)
     """)
         self.check_tokenize('f"""abc"""', """\
     FSTRING_START 'f\"""'        (1, 0) (1, 4)
-    STRING_MIDDLE 'abc'         (1, 4) (1, 7)
-    STRING_END '\"""'         (1, 7) (1, 10)
+    FSTRING_MIDDLE 'abc'         (1, 4) (1, 7)
+    FSTRING_END '\"""'         (1, 7) (1, 10)
     """)
         self.check_tokenize(r'f"abc\
 def"', """\
     FSTRING_START 'f"'          (1, 0) (1, 2)
-    STRING_MIDDLE 'abc\\\\\\ndef'  (1, 2) (2, 3)
-    STRING_END '"'           (2, 3) (2, 4)
+    FSTRING_MIDDLE 'abc\\\\\\ndef'  (1, 2) (2, 3)
+    FSTRING_END '"'           (2, 3) (2, 4)
     """)
         self.check_tokenize(r'Rf"abc\
 def"', """\
     FSTRING_START 'Rf"'         (1, 0) (1, 3)
-    STRING_MIDDLE 'abc\\\\\\ndef'  (1, 3) (2, 3)
-    STRING_END '"'           (2, 3) (2, 4)
+    FSTRING_MIDDLE 'abc\\\\\\ndef'  (1, 3) (2, 3)
+    FSTRING_END '"'           (2, 3) (2, 4)
     """)
         self.check_tokenize("f'some words {a+b:.3f} more words {c+d=} final words'", """\
     FSTRING_START "f'"          (1, 0) (1, 2)
-    STRING_MIDDLE 'some words ' (1, 2) (1, 13)
+    FSTRING_MIDDLE 'some words ' (1, 2) (1, 13)
     OP         '{'           (1, 13) (1, 14)
     NAME       'a'           (1, 14) (1, 15)
     OP         '+'           (1, 15) (1, 16)
     NAME       'b'           (1, 16) (1, 17)
     OP         ':'           (1, 17) (1, 18)
-    STRING_MIDDLE '.3f'         (1, 18) (1, 21)
+    FSTRING_MIDDLE '.3f'         (1, 18) (1, 21)
     OP         '}'           (1, 21) (1, 22)
-    STRING_MIDDLE ' more words ' (1, 22) (1, 34)
+    FSTRING_MIDDLE ' more words ' (1, 22) (1, 34)
     OP         '{'           (1, 34) (1, 35)
     NAME       'c'           (1, 35) (1, 36)
     OP         '+'           (1, 36) (1, 37)
     NAME       'd'           (1, 37) (1, 38)
     OP         '='           (1, 38) (1, 39)
     OP         '}'           (1, 39) (1, 40)
-    STRING_MIDDLE ' final words' (1, 40) (1, 52)
-    STRING_END "'"           (1, 52) (1, 53)
+    FSTRING_MIDDLE ' final words' (1, 40) (1, 52)
+    FSTRING_END "'"           (1, 52) (1, 53)
     """)
         self.check_tokenize("""\
 f'''{
@@ -565,22 +565,22 @@ f'''{
     NL         '\\n'          (2, 1) (2, 2)
     OP         '='           (3, 0) (3, 1)
     OP         '}'           (3, 1) (3, 2)
-    STRING_END "'''"         (3, 2) (3, 5)
+    FSTRING_END "'''"         (3, 2) (3, 5)
     """)
         self.check_tokenize("""\
 f'''__{
     x:a
 }__'''""", """\
     FSTRING_START "f'''"        (1, 0) (1, 4)
-    STRING_MIDDLE '__'          (1, 4) (1, 6)
+    FSTRING_MIDDLE '__'          (1, 4) (1, 6)
     OP         '{'           (1, 6) (1, 7)
     NL         '\\n'          (1, 7) (1, 8)
     NAME       'x'           (2, 4) (2, 5)
     OP         ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'a\\n'         (2, 6) (3, 0)
+    FSTRING_MIDDLE 'a\\n'         (2, 6) (3, 0)
     OP         '}'           (3, 0) (3, 1)
-    STRING_MIDDLE '__'          (3, 1) (3, 3)
-    STRING_END "'''"         (3, 3) (3, 6)
+    FSTRING_MIDDLE '__'          (3, 1) (3, 3)
+    FSTRING_END "'''"         (3, 3) (3, 6)
     """)
         self.check_tokenize("""\
 f'''__{
@@ -590,31 +590,31 @@ f'''__{
       d
 }__'''""", """\
     FSTRING_START "f'''"        (1, 0) (1, 4)
-    STRING_MIDDLE '__'          (1, 4) (1, 6)
+    FSTRING_MIDDLE '__'          (1, 4) (1, 6)
     OP         '{'           (1, 6) (1, 7)
     NL         '\\n'          (1, 7) (1, 8)
     NAME       'x'           (2, 4) (2, 5)
     OP         ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'a\\n    b\\n     c\\n      d\\n' (2, 6) (6, 0)
+    FSTRING_MIDDLE 'a\\n    b\\n     c\\n      d\\n' (2, 6) (6, 0)
     OP         '}'           (6, 0) (6, 1)
-    STRING_MIDDLE '__'          (6, 1) (6, 3)
-    STRING_END "'''"         (6, 3) (6, 6)
+    FSTRING_MIDDLE '__'          (6, 1) (6, 3)
+    FSTRING_END "'''"         (6, 3) (6, 6)
     """)
         self.check_tokenize("""\
 f'__{
     x:d
 }__'""", """\
     FSTRING_START "f'"          (1, 0) (1, 2)
-    STRING_MIDDLE '__'          (1, 2) (1, 4)
+    FSTRING_MIDDLE '__'          (1, 2) (1, 4)
     OP         '{'           (1, 4) (1, 5)
     NL         '\\n'          (1, 5) (1, 6)
     NAME       'x'           (2, 4) (2, 5)
     OP         ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'd'           (2, 6) (2, 7)
+    FSTRING_MIDDLE 'd'           (2, 6) (2, 7)
     NL         '\\n'          (2, 7) (2, 8)
     OP         '}'           (3, 0) (3, 1)
-    STRING_MIDDLE '__'          (3, 1) (3, 3)
-    STRING_END "'"           (3, 3) (3, 4)
+    FSTRING_MIDDLE '__'          (3, 1) (3, 3)
+    FSTRING_END "'"           (3, 3) (3, 4)
     """)
 
         self.check_tokenize("""\
@@ -1206,8 +1206,8 @@ a = f'''
     NAME       'a'           (1, 0) (1, 1)
     OP         '='           (1, 2) (1, 3)
     FSTRING_START "f\'\'\'"        (1, 4) (1, 8)
-    STRING_MIDDLE '\\n    Autorzy, którzy tą jednostkę mają wpisani jako AKTUALNA -- czyli' (1, 8) (2, 68)
-    STRING_END "\'\'\'"         (2, 68) (2, 71)
+    FSTRING_MIDDLE '\\n    Autorzy, którzy tą jednostkę mają wpisani jako AKTUALNA -- czyli' (1, 8) (2, 68)
+    FSTRING_END "\'\'\'"         (2, 68) (2, 71)
     """)
 
     def test_multiline_non_ascii_fstring_with_expr(self):
@@ -1216,12 +1216,12 @@ f'''
     🔗 This is a test {test_arg1}🔗
 🔗'''""", """\
     FSTRING_START "f\'\'\'"        (1, 0) (1, 4)
-    STRING_MIDDLE '\\n    🔗 This is a test ' (1, 4) (2, 21)
+    FSTRING_MIDDLE '\\n    🔗 This is a test ' (1, 4) (2, 21)
     OP         '{'           (2, 21) (2, 22)
     NAME       'test_arg1'   (2, 22) (2, 31)
     OP         '}'           (2, 31) (2, 32)
-    STRING_MIDDLE '🔗\\n🔗'        (2, 32) (3, 1)
-    STRING_END "\'\'\'"         (3, 1) (3, 4)
+    FSTRING_MIDDLE '🔗\\n🔗'        (2, 32) (3, 1)
+    FSTRING_END "\'\'\'"         (3, 1) (3, 4)
     """)
 
 class GenerateTokensTest(TokenizeTest):
@@ -2198,8 +2198,8 @@ class CTokenizeTest(TestCase):
     EQUAL      '='           (1, 2) (1, 3)
     STRING     '"doesn\\'t "' (1, 4) (1, 14)
     TAGSTRING_START \'shrink"\'     (1, 14) (1, 21)
-    STRING_MIDDLE ', does it'   (1, 21) (1, 30)
-    STRING_END \'"\'           (1, 30) (1, 31)
+    FSTRING_MIDDLE ', does it'   (1, 21) (1, 30)
+    FSTRING_END \'"\'           (1, 30) (1, 31)
     """)
 
         self.check_tokenize("x = 'abc' + 'ABC'", """\
@@ -2338,31 +2338,31 @@ c"""', """\
 
         self.check_tokenize('f"abc"', """\
     FSTRING_START 'f"'          (1, 0) (1, 2)
-    STRING_MIDDLE 'abc'         (1, 2) (1, 5)
-    STRING_END '"'           (1, 5) (1, 6)
+    FSTRING_MIDDLE 'abc'         (1, 2) (1, 5)
+    FSTRING_END '"'           (1, 5) (1, 6)
     """)
 
         self.check_tokenize('fR"a{b}c"', """\
     FSTRING_START 'fR"'         (1, 0) (1, 3)
-    STRING_MIDDLE 'a'           (1, 3) (1, 4)
+    FSTRING_MIDDLE 'a'           (1, 3) (1, 4)
     LBRACE     '{'           (1, 4) (1, 5)
     NAME       'b'           (1, 5) (1, 6)
     RBRACE     '}'           (1, 6) (1, 7)
-    STRING_MIDDLE 'c'           (1, 7) (1, 8)
-    STRING_END '"'           (1, 8) (1, 9)
+    FSTRING_MIDDLE 'c'           (1, 7) (1, 8)
+    FSTRING_END '"'           (1, 8) (1, 9)
     """)
 
         self.check_tokenize('f"""abc"""', """\
     FSTRING_START 'f\"""'        (1, 0) (1, 4)
-    STRING_MIDDLE 'abc'         (1, 4) (1, 7)
-    STRING_END '\"""'         (1, 7) (1, 10)
+    FSTRING_MIDDLE 'abc'         (1, 4) (1, 7)
+    FSTRING_END '\"""'         (1, 7) (1, 10)
     """)
 
         self.check_tokenize(r'f"abc\
 def"', """\
     FSTRING_START \'f"\'          (1, 0) (1, 2)
-    STRING_MIDDLE 'abc\\\\\\ndef'  (1, 2) (2, 3)
-    STRING_END '"'           (2, 3) (2, 4)
+    FSTRING_MIDDLE 'abc\\\\\\ndef'  (1, 2) (2, 3)
+    FSTRING_END '"'           (2, 3) (2, 4)
     """)
 
         self.check_tokenize('''\
@@ -2372,20 +2372,20 @@ a}"''', """\
     LBRACE     '{'           (1, 2) (1, 3)
     NAME       'a'           (2, 0) (2, 1)
     RBRACE     '}'           (2, 1) (2, 2)
-    STRING_END '"'           (2, 2) (2, 3)
+    FSTRING_END '"'           (2, 2) (2, 3)
     """)
 
         self.check_tokenize(r'Rf"abc\
 def"', """\
     FSTRING_START 'Rf"'         (1, 0) (1, 3)
-    STRING_MIDDLE 'abc\\\\\\ndef'  (1, 3) (2, 3)
-    STRING_END '"'           (2, 3) (2, 4)
+    FSTRING_MIDDLE 'abc\\\\\\ndef'  (1, 3) (2, 3)
+    FSTRING_END '"'           (2, 3) (2, 4)
     """)
 
         self.check_tokenize(r'f"hola\\\r\ndfgf"', """\
     FSTRING_START \'f"\'          (1, 0) (1, 2)
-    STRING_MIDDLE 'hola\\\\\\\\\\\\r\\\\ndfgf' (1, 2) (1, 16)
-    STRING_END \'"\'           (1, 16) (1, 17)
+    FSTRING_MIDDLE 'hola\\\\\\\\\\\\r\\\\ndfgf' (1, 2) (1, 16)
+    FSTRING_END \'"\'           (1, 16) (1, 17)
     """)
 
         self.check_tokenize("""\
@@ -2393,14 +2393,14 @@ f'''__{
     x:a
 }__'''""", """\
     FSTRING_START "f'''"        (1, 0) (1, 4)
-    STRING_MIDDLE '__'          (1, 4) (1, 6)
+    FSTRING_MIDDLE '__'          (1, 4) (1, 6)
     LBRACE     '{'           (1, 6) (1, 7)
     NAME       'x'           (2, 4) (2, 5)
     COLON      ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'a\\n'         (2, 6) (3, 0)
+    FSTRING_MIDDLE 'a\\n'         (2, 6) (3, 0)
     RBRACE     '}'           (3, 0) (3, 1)
-    STRING_MIDDLE '__'          (3, 1) (3, 3)
-    STRING_END "'''"         (3, 3) (3, 6)
+    FSTRING_MIDDLE '__'          (3, 1) (3, 3)
+    FSTRING_END "'''"         (3, 3) (3, 6)
     """)
 
         self.check_tokenize("""\
@@ -2411,14 +2411,14 @@ f'''__{
       d
 }__'''""", """\
     FSTRING_START "f'''"        (1, 0) (1, 4)
-    STRING_MIDDLE '__'          (1, 4) (1, 6)
+    FSTRING_MIDDLE '__'          (1, 4) (1, 6)
     LBRACE     '{'           (1, 6) (1, 7)
     NAME       'x'           (2, 4) (2, 5)
     COLON      ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'a\\n    b\\n     c\\n      d\\n' (2, 6) (6, 0)
+    FSTRING_MIDDLE 'a\\n    b\\n     c\\n      d\\n' (2, 6) (6, 0)
     RBRACE     '}'           (6, 0) (6, 1)
-    STRING_MIDDLE '__'          (6, 1) (6, 3)
-    STRING_END "'''"         (6, 3) (6, 6)
+    FSTRING_MIDDLE '__'          (6, 1) (6, 3)
+    FSTRING_END "'''"         (6, 3) (6, 6)
     """)
 
         self.check_tokenize("""\
@@ -2426,14 +2426,14 @@ f'__{
     x:d
 }__'""", """\
     FSTRING_START "f'"          (1, 0) (1, 2)
-    STRING_MIDDLE '__'          (1, 2) (1, 4)
+    FSTRING_MIDDLE '__'          (1, 2) (1, 4)
     LBRACE     '{'           (1, 4) (1, 5)
     NAME       'x'           (2, 4) (2, 5)
     COLON      ':'           (2, 5) (2, 6)
-    STRING_MIDDLE 'd'           (2, 6) (2, 7)
+    FSTRING_MIDDLE 'd'           (2, 6) (2, 7)
     RBRACE     '}'           (3, 0) (3, 1)
-    STRING_MIDDLE '__'          (3, 1) (3, 3)
-    STRING_END "'"           (3, 3) (3, 4)
+    FSTRING_MIDDLE '__'          (3, 1) (3, 3)
+    FSTRING_END "'"           (3, 3) (3, 4)
     """)
 
     def test_function(self):

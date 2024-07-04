@@ -80,7 +80,8 @@ extern "C" {
                                  (x) == NEWLINE   || \\
                                  (x) == INDENT    || \\
                                  (x) == DEDENT)
-#define ISSTRINGLIT(x)          ((x) == STRING_MIDDLE)
+#define ISSTRINGLIT(x)          ((x) == STRING           || \\
+                                 (x) == FSTRING_MIDDLE)
 
 
 // Export these 4 symbols for 'test_peg_generator'
