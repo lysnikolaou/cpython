@@ -33,6 +33,7 @@
 #include "pycore_weakref.h"       // _PyWeakref_GET_REF()
 #include "cpython/optimizer.h"    // _Py_MAX_ALLOWED_BUILTINS_MODIFICATIONS
 #include "pycore_obmalloc.h"      // _PyMem_init_obmalloc()
+#include "pycore_interpolation.h" // _PyInterpolation_InitTypes
 
 #include "opcode.h"
 
@@ -763,6 +764,11 @@ pycore_init_types(PyInterpreterState *interp)
     }
 
     status = _PyXI_InitTypes(interp);
+    if (_PyStatus_EXCEPTION(status)) {
+        return status;
+    }
+
+    status = _PyInterpolation_InitTypes(interp);
     if (_PyStatus_EXCEPTION(status)) {
         return status;
     }
@@ -1825,6 +1831,7 @@ finalize_interp_types(PyInterpreterState *interp)
     _PyFloat_FiniType(interp);
     _PyLong_FiniTypes(interp);
     _PyThread_FiniType(interp);
+    _PyInterpolation_FiniTypes(interp);
     // XXX fini collections module static types (_PyStaticType_Dealloc())
     // XXX fini IO module static types (_PyStaticType_Dealloc())
     _PyErr_FiniTypes(interp);

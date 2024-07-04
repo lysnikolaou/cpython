@@ -1669,7 +1669,7 @@
             conversion = values[2];
             if (oparg == 4)
             format_spec = values[3];
-            interpolation = _PyTagString_CreateInterpolation(lambda, str, conversion, format_spec);
+            interpolation = _PyInterpolation_Create(lambda, str, conversion, format_spec);
             if (interpolation == NULL) JUMP_TO_ERROR();
             stack_pointer[-oparg] = interpolation;
             stack_pointer += 1 - oparg;

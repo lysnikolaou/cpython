@@ -1651,7 +1651,7 @@ dummy_func(
                 conversion = values[2];
             if (oparg == 4)
                 format_spec = values[3];
-            interpolation = _PyTagString_CreateInterpolation(lambda, str, conversion, format_spec);
+            interpolation = _PyInterpolation_Create(lambda, str, conversion, format_spec);
             ERROR_IF(interpolation == NULL, error);
         }
 
