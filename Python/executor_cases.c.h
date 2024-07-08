@@ -1664,10 +1664,11 @@
             PyObject *interpolation;
             oparg = CURRENT_OPARG();
             values = &stack_pointer[-oparg];
+            assert(2 <= oparg && oparg <= 4);
             PyObject *lambda = values[0], *str = values[1], *conversion = NULL, *format_spec = NULL;
-            if (oparg == 3)
+            if (oparg >= 3)
             conversion = values[2];
-            if (oparg == 4)
+            if (oparg >= 4)
             format_spec = values[3];
             interpolation = _PyInterpolation_Create(lambda, str, conversion, format_spec);
             if (interpolation == NULL) JUMP_TO_ERROR();
