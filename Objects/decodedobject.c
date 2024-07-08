@@ -101,6 +101,13 @@ exit:
     return final;
 }
 
+static void
+DecodedConcrete_dealloc(PyObject *self)
+{
+    Py_XDECREF(((PyDecodedObject *)self)->raw);
+    PyUnicode_Type.tp_dealloc(self);
+}
+
 static PyMemberDef DecodedConcrete_members[] = {
     {"raw", Py_T_OBJECT_EX, offsetof(PyDecodedObject, raw), 0, "Raw"},
     {NULL}
@@ -118,6 +125,7 @@ PyTypeObject _PyDecodedConcrete_Type = {
     .tp_new = DecodedConcrete_new,
     .tp_members = DecodedConcrete_members,
     .tp_repr = DecodedConcrete_repr,
+    .tp_dealloc = DecodedConcrete_dealloc,
 };
 
 PyStatus
