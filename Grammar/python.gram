@@ -916,7 +916,7 @@ fstring_middle[expr_ty]:
     | t=FSTRING_MIDDLE { _PyPegen_constant_from_token(p, t) }
 fstring_replacement_field[expr_ty]:
     | '{' a=annotated_rhs debug_expr='='? conversion=[fstring_conversion] format=[fstring_full_format_spec] rbrace='}' {
-        _PyPegen_formatted_value(p, a, debug_expr, conversion, format, rbrace, EXTRA) }
+        _PyPegen_formatted_value(p, a, debug_expr, 0, conversion, format, rbrace, EXTRA) }
     | invalid_replacement_field
 fstring_conversion[ResultTokenWithMetadata*]:
     | conv_token="!" conv=NAME { _PyPegen_check_fstring_conversion(p, conv_token, conv) }
@@ -928,8 +928,12 @@ fstring_format_spec[expr_ty]:
 fstring[expr_ty]:
     | a=FSTRING_START b=fstring_middle* c=FSTRING_END { _PyPegen_joined_str(p, 0, a, (asdl_expr_seq*)b, c) }
 
+tagstring_replacement_field[expr_ty]:
+    | '{' a=annotated_rhs debug_expr='='? conversion=[fstring_conversion] format=[fstring_full_format_spec] rbrace='}' {
+        _PyPegen_formatted_value(p, a, debug_expr, 1, conversion, format, rbrace, EXTRA) }
+    | invalid_replacement_field
 tagstring_middle[expr_ty]:
-    | fstring_replacement_field
+    | tagstring_replacement_field
     | t=FSTRING_MIDDLE { _PyPegen_decoded_from_token(p, t) }
 tagstring[expr_ty] (memo):
     | a=TAGSTRING_START b=tagstring_middle* c=FSTRING_END { _PyPegen_tag_str(p, a, (asdl_expr_seq*)b, c) }

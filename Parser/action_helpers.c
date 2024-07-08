@@ -1552,7 +1552,8 @@ expr_ty _PyPegen_constant_from_string(Parser* p, Token* tok) {
     return _PyAST_Constant(s, kind, tok->lineno, tok->col_offset, tok->end_lineno, tok->end_col_offset, p->arena);
 }
 
-expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, ResultTokenWithMetadata *conversion,
+expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, int debug_as_decoded_ast,
+                                 ResultTokenWithMetadata *conversion,
                                  ResultTokenWithMetadata *format, Token *closing_brace, int lineno, int col_offset,
                                  int end_lineno, int end_col_offset, PyArena *arena) {
     int conversion_val = -1;
@@ -1603,8 +1604,16 @@ expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, Re
             debug_metadata = closing_brace->metadata;
         }
 
-        expr_ty debug_text = _PyAST_Constant(debug_metadata, NULL, lineno, col_offset + 1, debug_end_line,
+        
+        expr_ty debug_text;
+        if (debug_as_decoded_ast) {
+            debug_text = _PyAST_Decoded(debug_metadata, NULL, lineno, col_offset + 1, debug_end_line,
                                              debug_end_offset - 1, p->arena);
+        }
+        else {
+            debug_text = _PyAST_Constant(debug_metadata, NULL, lineno, col_offset + 1, debug_end_line,
+                                             debug_end_offset - 1, p->arena);
+        }
         if (!debug_text) {
             return NULL;
         }
