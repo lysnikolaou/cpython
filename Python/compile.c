@@ -5017,7 +5017,7 @@ compiler_interpolation(struct compiler *c, expr_ty e)
         VISIT(c, expr, e->v.Interpolation.conversion);
         oparg++;
     }
-    if (e->v.Interpolation.conversion) {
+    if (e->v.Interpolation.format_spec) {
         VISIT(c, expr, e->v.Interpolation.format_spec);
         oparg++;
     }
