@@ -2944,6 +2944,38 @@ class SupportsRound[T](Protocol):
         pass
 
 
+@runtime_checkable
+class Decoded(Protocol):
+    """The literal part of a tag string"""
+
+    __slots__ = ()
+
+    def __str__(self) -> str:
+        ...
+
+    raw: str
+
+
+@runtime_checkable
+class Interpolation(Protocol):
+    """The expression part of a tag string"""
+
+    __slots__ = ()
+
+    def __len__(self):
+        ...
+
+    def __getitem__(self):
+        ...
+
+    def getvalue(self) -> Callable[[], Any]:
+        ...
+
+    expr: str
+    conv: Literal["a", "r", "s"] | None
+    format_spec: str | None
+
+
 def _make_nmtuple(name, types, module, defaults = ()):
     fields = [n for n, t in types]
     types = {n: _type_check(t, f"field {n} annotation must be a type")
