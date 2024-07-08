@@ -6324,6 +6324,10 @@ compiler_visit_expr(struct compiler *c, expr_ty e)
         return compiler_tuple(c, e);
     case Interpolation_kind:
         return compiler_interpolation(c, e);
+    case Decoded_kind:
+        ADDOP_LOAD_CONST(c, loc, e->v.Constant.value);
+        ADDOP(c, loc, BUILD_DECODED);
+        break;
     }
     return SUCCESS;
 }

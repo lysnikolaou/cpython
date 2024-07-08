@@ -1510,6 +1510,24 @@ expr_ty _PyPegen_constant_from_token(Parser* p, Token* tok) {
                            p->arena);
 }
 
+expr_ty _PyPegen_decoded_from_token(Parser* p, Token* tok) {
+    char* bstr = PyBytes_AsString(tok->bytes);
+    if (bstr == NULL) {
+        return NULL;
+    }
+    PyObject* str = PyUnicode_FromString(bstr);
+    if (str == NULL) {
+        return NULL;
+    }
+    if (_PyArena_AddPyObject(p->arena, str) < 0) {
+        Py_DECREF(str);
+        return NULL;
+    }
+    return _PyAST_Decoded(str, NULL, tok->lineno, tok->col_offset,
+                           tok->end_lineno, tok->end_col_offset,
+                           p->arena);
+}
+
 expr_ty _PyPegen_constant_from_string(Parser* p, Token* tok) {
     char* the_str = PyBytes_AsString(tok->bytes);
     if (the_str == NULL) {

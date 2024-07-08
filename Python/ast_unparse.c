@@ -958,6 +958,15 @@ append_ast_expr(_PyUnicodeWriter *writer, expr_ty e, int level)
         return append_ast_tuple(writer, e, level);
     case Interpolation_kind:
         return append_interpolation(writer, e);
+    case Decoded_kind:
+        if (e->v.Decoded.value == Py_Ellipsis) {
+            APPEND_STR_FINISH("...");
+        }
+        if (e->v.Decoded.kind != NULL
+            && -1 == _PyUnicodeWriter_WriteStr(writer, e->v.Decoded.kind)) {
+            return -1;
+        }
+        return append_ast_constant(writer, e->v.Decoded.value);
     case NamedExpr_kind:
         return append_named_expr(writer, e, level);
     // No default so compiler emits a warning for unhandled cases

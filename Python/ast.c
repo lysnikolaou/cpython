@@ -392,6 +392,12 @@ validate_expr(struct validator *state, expr_ty exp, expr_context_ty ctx)
               (exp->v.Interpolation.format_spec == NULL ||
                 validate_expr(state, exp->v.Interpolation.format_spec, Load));
         break;
+    case Decoded_kind:
+        if (!validate_constant(state, exp->v.Decoded.value)) {
+            return 0;
+        }
+        ret = 1;
+        break;
     case NamedExpr_kind:
         if (exp->v.NamedExpr.target->kind != Name_kind) {
             PyErr_SetString(PyExc_TypeError,

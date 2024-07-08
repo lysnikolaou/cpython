@@ -845,6 +845,13 @@
             break;
         }
 
+        case _BUILD_DECODED: {
+            _Py_UopsSymbol *decoded;
+            decoded = sym_new_not_null(ctx);
+            stack_pointer[-1] = decoded;
+            break;
+        }
+
         case _BUILD_LIST: {
             _Py_UopsSymbol *list;
             list = sym_new_not_null(ctx);

@@ -2350,6 +2350,8 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         if (e->v.Interpolation.format_spec)
             VISIT(st, expr, e->v.Interpolation.format_spec);
         break;
+    case Decoded_kind:
+        break;
     }
     VISIT_QUIT(st, 1);
 }

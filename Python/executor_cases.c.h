@@ -1676,6 +1676,16 @@
             break;
         }
 
+        case _BUILD_DECODED: {
+            PyObject *s;
+            PyObject *decoded;
+            s = stack_pointer[-1];
+            decoded = _PyDecodedConcrete_Create(s);
+            if (decoded == NULL) JUMP_TO_ERROR();
+            stack_pointer[-1] = decoded;
+            break;
+        }
+
         case _BUILD_LIST: {
             PyObject **values;
             PyObject *list;

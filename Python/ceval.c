@@ -31,7 +31,8 @@
 #include "pycore_typeobject.h"    // _PySuper_Lookup()
 #include "pycore_uop_ids.h"       // Uops
 #include "pycore_pyerrors.h"
-#include "pycore_interpolation.h" // _PyTagString_CreateInterpolation
+#include "pycore_interpolation.h" // _PyInterpolation_Create
+#include "pycore_decoded.h"       // _PyDecoded_Create
 
 #include "pycore_dict.h"
 #include "dictobject.h"

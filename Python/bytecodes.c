@@ -1655,6 +1655,11 @@ dummy_func(
             ERROR_IF(interpolation == NULL, error);
         }
 
+        inst(BUILD_DECODED, (s -- decoded)) {
+            decoded = _PyDecodedConcrete_Create(s);
+            ERROR_IF(decoded == NULL, error);
+        }
+
         inst(BUILD_LIST, (values[oparg] -- list)) {
             list = _PyList_FromArraySteal(values, oparg);
             ERROR_IF(list == NULL, error);

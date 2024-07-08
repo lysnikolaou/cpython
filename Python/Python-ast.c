@@ -63,6 +63,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->Compare_type);
     Py_CLEAR(state->Constant_type);
     Py_CLEAR(state->Continue_type);
+    Py_CLEAR(state->Decoded_type);
     Py_CLEAR(state->Del_singleton);
     Py_CLEAR(state->Del_type);
     Py_CLEAR(state->Delete_type);
@@ -644,6 +645,10 @@ static const char * const Interpolation_fields[]={
     "str",
     "conversion",
     "format_spec",
+};
+static const char * const Decoded_fields[]={
+    "value",
+    "kind",
 };
 static const char * const Constant_fields[]={
     "value",
@@ -3347,6 +3352,46 @@ add_ast_annotations(struct ast_state *state)
         return 0;
     }
     Py_DECREF(Interpolation_annotations);
+    PyObject *Decoded_annotations = PyDict_New();
+    if (!Decoded_annotations) return 0;
+    {
+        PyObject *type = (PyObject *)&PyBaseObject_Type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(Decoded_annotations, "value", type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Decoded_annotations);
+            return 0;
+        }
+    }
+    {
+        PyObject *type = (PyObject *)&PyUnicode_Type;
+        type = _Py_union_type_or(type, Py_None);
+        cond = type != NULL;
+        if (!cond) {
+            Py_DECREF(Decoded_annotations);
+            return 0;
+        }
+        cond = PyDict_SetItemString(Decoded_annotations, "kind", type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Decoded_annotations);
+            return 0;
+        }
+    }
+    cond = PyObject_SetAttrString(state->Decoded_type, "_field_types",
+                                  Decoded_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(Decoded_annotations);
+        return 0;
+    }
+    cond = PyObject_SetAttrString(state->Decoded_type, "__annotations__",
+                                  Decoded_annotations) == 0;
+    if (!cond) {
+        Py_DECREF(Decoded_annotations);
+        return 0;
+    }
+    Py_DECREF(Decoded_annotations);
     PyObject *Constant_annotations = PyDict_New();
     if (!Constant_annotations) return 0;
     {
@@ -5900,6 +5945,7 @@ init_types(struct ast_state *state)
         "     | JoinedStr(expr* values)\n"
         "     | TagString(expr tag, expr str)\n"
         "     | Interpolation(expr lambda, expr str, expr? conversion, expr? format_spec)\n"
+        "     | Decoded(constant value, string? kind)\n"
         "     | Constant(constant value, string? kind)\n"
         "     | Attribute(expr value, identifier attr, expr_context ctx)\n"
         "     | Subscript(expr value, expr slice, expr_context ctx)\n"
@@ -6012,6 +6058,12 @@ init_types(struct ast_state *state)
         return -1;
     if (PyObject_SetAttr(state->Interpolation_type, state->format_spec,
         Py_None) == -1)
+        return -1;
+    state->Decoded_type = make_type(state, "Decoded", state->expr_type,
+                                    Decoded_fields, 2,
+        "Decoded(constant value, string? kind)");
+    if (!state->Decoded_type) return -1;
+    if (PyObject_SetAttr(state->Decoded_type, state->kind, Py_None) == -1)
         return -1;
     state->Constant_type = make_type(state, "Constant", state->expr_type,
                                      Constant_fields, 2,
@@ -7763,6 +7815,29 @@ _PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion, expr_ty
 }
 
 expr_ty
+_PyAST_Decoded(constant value, string kind, int lineno, int col_offset, int
+               end_lineno, int end_col_offset, PyArena *arena)
+{
+    expr_ty p;
+    if (!value) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field 'value' is required for Decoded");
+        return NULL;
+    }
+    p = (expr_ty)_PyArena_Malloc(arena, sizeof(*p));
+    if (!p)
+        return NULL;
+    p->kind = Decoded_kind;
+    p->v.Decoded.value = value;
+    p->v.Decoded.kind = kind;
+    p->lineno = lineno;
+    p->col_offset = col_offset;
+    p->end_lineno = end_lineno;
+    p->end_col_offset = end_col_offset;
+    return p;
+}
+
+expr_ty
 _PyAST_Constant(constant value, string kind, int lineno, int col_offset, int
                 end_lineno, int end_col_offset, PyArena *arena)
 {
@@ -9461,6 +9536,21 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
         value = ast2obj_expr(state, vstate, o->v.Interpolation.format_spec);
         if (!value) goto failed;
         if (PyObject_SetAttr(result, state->format_spec, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        break;
+    case Decoded_kind:
+        tp = (PyTypeObject *)state->Decoded_type;
+        result = PyType_GenericNew(tp, NULL, NULL);
+        if (!result) goto failed;
+        value = ast2obj_constant(state, vstate, o->v.Decoded.value);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->value, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_string(state, vstate, o->v.Decoded.kind);
+        if (!value) goto failed;
+        if (PyObject_SetAttr(result, state->kind, value) == -1)
             goto failed;
         Py_DECREF(value);
         break;
@@ -14793,6 +14883,54 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
         if (*out == NULL) goto failed;
         return 0;
     }
+    tp = state->Decoded_type;
+    isinstance = PyObject_IsInstance(obj, tp);
+    if (isinstance == -1) {
+        return -1;
+    }
+    if (isinstance) {
+        constant value;
+        string kind;
+
+        if (PyObject_GetOptionalAttr(obj, state->value, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL) {
+            PyErr_SetString(PyExc_TypeError, "required field \"value\" missing from Decoded");
+            return -1;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Decoded' node")) {
+                goto failed;
+            }
+            res = obj2ast_constant(state, tmp, &value, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        if (PyObject_GetOptionalAttr(obj, state->kind, &tmp) < 0) {
+            return -1;
+        }
+        if (tmp == NULL || tmp == Py_None) {
+            Py_CLEAR(tmp);
+            kind = NULL;
+        }
+        else {
+            int res;
+            if (_Py_EnterRecursiveCall(" while traversing 'Decoded' node")) {
+                goto failed;
+            }
+            res = obj2ast_string(state, tmp, &kind, arena);
+            _Py_LeaveRecursiveCall();
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        }
+        *out = _PyAST_Decoded(value, kind, lineno, col_offset, end_lineno,
+                              end_col_offset, arena);
+        if (*out == NULL) goto failed;
+        return 0;
+    }
     tp = state->Constant_type;
     isinstance = PyObject_IsInstance(obj, tp);
     if (isinstance == -1) {
@@ -17751,6 +17889,9 @@ astmodule_exec(PyObject *m)
     }
     if (PyModule_AddObjectRef(m, "Interpolation", state->Interpolation_type) <
         0) {
+        return -1;
+    }
+    if (PyModule_AddObjectRef(m, "Decoded", state->Decoded_type) < 0) {
         return -1;
     }
     if (PyModule_AddObjectRef(m, "Constant", state->Constant_type) < 0) {

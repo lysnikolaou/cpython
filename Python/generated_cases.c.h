@@ -531,6 +531,19 @@
             DISPATCH();
         }
 
+        TARGET(BUILD_DECODED) {
+            frame->instr_ptr = next_instr;
+            next_instr += 1;
+            INSTRUCTION_STATS(BUILD_DECODED);
+            PyObject *s;
+            PyObject *decoded;
+            s = stack_pointer[-1];
+            decoded = _PyDecodedConcrete_Create(s);
+            if (decoded == NULL) goto pop_1_error;
+            stack_pointer[-1] = decoded;
+            DISPATCH();
+        }
+
         TARGET(BUILD_INTERPOLATION) {
             frame->instr_ptr = next_instr;
             next_instr += 1;

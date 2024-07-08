@@ -818,6 +818,8 @@ astfold_expr(expr_ty node_, PyArena *ctx_, _PyASTOptimizeState *state)
         CALL_OPT(astfold_expr, expr_ty, node_->v.Interpolation.conversion);
         CALL_OPT(astfold_expr, expr_ty, node_->v.Interpolation.format_spec);
         break;
+    case Decoded_kind:
+        break;
     case Name_kind:
         if (node_->v.Name.ctx == Load &&
                 _PyUnicode_EqualToASCIIString(node_->v.Name.id, "__debug__")) {
