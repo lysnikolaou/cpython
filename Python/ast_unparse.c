@@ -642,6 +642,10 @@ append_fstring_element(_PyUnicodeWriter *writer, expr_ty e, bool is_format_spec)
         return append_fstring_unicode(writer, e->v.Constant.value);
     case FormattedValue_kind:
         return append_formattedvalue(writer, e);
+    case Interpolation_kind:
+        return append_interpolation(writer, e);
+    case Decoded_kind:
+        return append_fstring_unicode(writer, e->v.Decoded.value);
     default:
         PyErr_SetString(PyExc_SystemError,
                         "unknown expression kind inside f-string");
