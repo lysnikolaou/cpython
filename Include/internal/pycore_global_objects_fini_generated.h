@@ -1004,6 +1004,7 @@ _PyStaticObjects_CheckRefcnt(PyInterpreterState *interp) {
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(insert_pis));
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(instructions));
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(intern));
+    _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(interpolation_lambda));
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(intersection));
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(interval));
     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(is_running));

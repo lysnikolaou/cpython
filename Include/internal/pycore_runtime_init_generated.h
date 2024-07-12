@@ -1002,6 +1002,7 @@ extern "C" {
     INIT_ID(insert_pis), \
     INIT_ID(instructions), \
     INIT_ID(intern), \
+    INIT_ID(interpolation_lambda), \
     INIT_ID(intersection), \
     INIT_ID(interval), \
     INIT_ID(is_running), \
