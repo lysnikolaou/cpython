@@ -2210,7 +2210,7 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         break;
     case Lambda_kind: {
         bool is_in_class = st->st_cur->ste_type == ClassBlock;
-        bool add_class_scope = e->v.Lambda.is_interpolation && is_in_class;
+        bool add_class_scope = is_in_class && e->v.Lambda.sees_class_scope;
         st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || add_class_scope;
         if (e->v.Lambda.args->defaults)
             VISIT_SEQ(st, expr, e->v.Lambda.args->defaults);

@@ -1413,12 +1413,12 @@ _PyPegen_name_from_f_string_start(Parser *p, Token* t)
 }
 
 static expr_ty
-make_interpolation_lambda(Parser *p, expr_ty arg)
+lambdafy(Parser *p, expr_ty arg, int sees_class_scope)
 {
     arguments_ty args = _PyPegen_empty_arguments(p);
     if (args == NULL)
         return NULL;
-    return _PyAST_Lambda(args, arg, 1,
+    return _PyAST_Lambda(args, arg, sees_class_scope,
             arg->lineno, arg->col_offset, arg->end_lineno, arg->end_col_offset,
             p->arena);
 }
@@ -1441,7 +1441,7 @@ _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
             if (value->kind == FormattedValue_kind) {
 
                 expr_ty expr = value->v.FormattedValue.value;
-                expr_ty lambda = make_interpolation_lambda(p, expr);
+                expr_ty lambda = lambdafy(p, expr, 1);
                 if (lambda == NULL) {
                     return NULL;
                 }

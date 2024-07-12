@@ -206,7 +206,6 @@ struct ast_state {
     PyObject *id;
     PyObject *ifs;
     PyObject *is_async;
-    PyObject *is_interpolation;
     PyObject *items;
     PyObject *iter;
     PyObject *key;
@@ -243,6 +242,7 @@ struct ast_state {
     PyObject *rest;
     PyObject *returns;
     PyObject *right;
+    PyObject *sees_class_scope;
     PyObject *simple;
     PyObject *slice;
     PyObject *step;

@@ -392,7 +392,7 @@ struct _expr {
         struct {
             arguments_ty args;
             expr_ty body;
-            int is_interpolation;
+            int sees_class_scope;
         } Lambda;
 
         struct {
@@ -801,7 +801,7 @@ expr_ty _PyAST_BinOp(expr_ty left, operator_ty op, expr_ty right, int lineno,
 expr_ty _PyAST_UnaryOp(unaryop_ty op, expr_ty operand, int lineno, int
                        col_offset, int end_lineno, int end_col_offset, PyArena
                        *arena);
-expr_ty _PyAST_Lambda(arguments_ty args, expr_ty body, int is_interpolation,
+expr_ty _PyAST_Lambda(arguments_ty args, expr_ty body, int sees_class_scope,
                       int lineno, int col_offset, int end_lineno, int
                       end_col_offset, PyArena *arena);
 expr_ty _PyAST_IfExp(expr_ty test, expr_ty body, expr_ty orelse, int lineno,

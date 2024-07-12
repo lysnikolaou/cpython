@@ -225,7 +225,6 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->id);
     Py_CLEAR(state->ifs);
     Py_CLEAR(state->is_async);
-    Py_CLEAR(state->is_interpolation);
     Py_CLEAR(state->items);
     Py_CLEAR(state->iter);
     Py_CLEAR(state->key);
@@ -262,6 +261,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->rest);
     Py_CLEAR(state->returns);
     Py_CLEAR(state->right);
+    Py_CLEAR(state->sees_class_scope);
     Py_CLEAR(state->simple);
     Py_CLEAR(state->slice);
     Py_CLEAR(state->step);
@@ -334,7 +334,6 @@ static int init_identifiers(struct ast_state *state)
     if ((state->id = PyUnicode_InternFromString("id")) == NULL) return -1;
     if ((state->ifs = PyUnicode_InternFromString("ifs")) == NULL) return -1;
     if ((state->is_async = PyUnicode_InternFromString("is_async")) == NULL) return -1;
-    if ((state->is_interpolation = PyUnicode_InternFromString("is_interpolation")) == NULL) return -1;
     if ((state->items = PyUnicode_InternFromString("items")) == NULL) return -1;
     if ((state->iter = PyUnicode_InternFromString("iter")) == NULL) return -1;
     if ((state->key = PyUnicode_InternFromString("key")) == NULL) return -1;
@@ -366,6 +365,7 @@ static int init_identifiers(struct ast_state *state)
     if ((state->rest = PyUnicode_InternFromString("rest")) == NULL) return -1;
     if ((state->returns = PyUnicode_InternFromString("returns")) == NULL) return -1;
     if ((state->right = PyUnicode_InternFromString("right")) == NULL) return -1;
+    if ((state->sees_class_scope = PyUnicode_InternFromString("sees_class_scope")) == NULL) return -1;
     if ((state->simple = PyUnicode_InternFromString("simple")) == NULL) return -1;
     if ((state->slice = PyUnicode_InternFromString("slice")) == NULL) return -1;
     if ((state->step = PyUnicode_InternFromString("step")) == NULL) return -1;
@@ -581,7 +581,7 @@ static const char * const UnaryOp_fields[]={
 static const char * const Lambda_fields[]={
     "args",
     "body",
-    "is_interpolation",
+    "sees_class_scope",
 };
 static const char * const IfExp_fields[]={
     "test",
@@ -2672,7 +2672,7 @@ add_ast_annotations(struct ast_state *state)
     {
         PyObject *type = (PyObject *)&PyLong_Type;
         Py_INCREF(type);
-        cond = PyDict_SetItemString(Lambda_annotations, "is_interpolation",
+        cond = PyDict_SetItemString(Lambda_annotations, "sees_class_scope",
                                     type) == 0;
         Py_DECREF(type);
         if (!cond) {
@@ -5942,7 +5942,7 @@ init_types(struct ast_state *state)
         "     | NamedExpr(expr target, expr value)\n"
         "     | BinOp(expr left, operator op, expr right)\n"
         "     | UnaryOp(unaryop op, expr operand)\n"
-        "     | Lambda(arguments args, expr body, int is_interpolation)\n"
+        "     | Lambda(arguments args, expr body, int sees_class_scope)\n"
         "     | IfExp(expr test, expr body, expr orelse)\n"
         "     | Dict(expr* keys, expr* values)\n"
         "     | Set(expr* elts)\n"
@@ -5994,7 +5994,7 @@ init_types(struct ast_state *state)
     if (!state->UnaryOp_type) return -1;
     state->Lambda_type = make_type(state, "Lambda", state->expr_type,
                                    Lambda_fields, 3,
-        "Lambda(arguments args, expr body, int is_interpolation)");
+        "Lambda(arguments args, expr body, int sees_class_scope)");
     if (!state->Lambda_type) return -1;
     state->IfExp_type = make_type(state, "IfExp", state->expr_type,
                                   IfExp_fields, 3,
@@ -7418,7 +7418,7 @@ _PyAST_UnaryOp(unaryop_ty op, expr_ty operand, int lineno, int col_offset, int
 }
 
 expr_ty
-_PyAST_Lambda(arguments_ty args, expr_ty body, int is_interpolation, int
+_PyAST_Lambda(arguments_ty args, expr_ty body, int sees_class_scope, int
               lineno, int col_offset, int end_lineno, int end_col_offset,
               PyArena *arena)
 {
@@ -7439,7 +7439,7 @@ _PyAST_Lambda(arguments_ty args, expr_ty body, int is_interpolation, int
     p->kind = Lambda_kind;
     p->v.Lambda.args = args;
     p->v.Lambda.body = body;
-    p->v.Lambda.is_interpolation = is_interpolation;
+    p->v.Lambda.sees_class_scope = sees_class_scope;
     p->lineno = lineno;
     p->col_offset = col_offset;
     p->end_lineno = end_lineno;
@@ -9284,9 +9284,9 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
         if (PyObject_SetAttr(result, state->body, value) == -1)
             goto failed;
         Py_DECREF(value);
-        value = ast2obj_int(state, vstate, o->v.Lambda.is_interpolation);
+        value = ast2obj_int(state, vstate, o->v.Lambda.sees_class_scope);
         if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->is_interpolation, value) == -1)
+        if (PyObject_SetAttr(result, state->sees_class_scope, value) == -1)
             goto failed;
         Py_DECREF(value);
         break;
@@ -13806,7 +13806,7 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
     if (isinstance) {
         arguments_ty args;
         expr_ty body;
-        int is_interpolation;
+        int sees_class_scope;
 
         if (PyObject_GetOptionalAttr(obj, state->args, &tmp) < 0) {
             return -1;
@@ -13842,11 +13842,11 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
         }
-        if (PyObject_GetOptionalAttr(obj, state->is_interpolation, &tmp) < 0) {
+        if (PyObject_GetOptionalAttr(obj, state->sees_class_scope, &tmp) < 0) {
             return -1;
         }
         if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"is_interpolation\" missing from Lambda");
+            PyErr_SetString(PyExc_TypeError, "required field \"sees_class_scope\" missing from Lambda");
             return -1;
         }
         else {
@@ -13854,12 +13854,12 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
             if (_Py_EnterRecursiveCall(" while traversing 'Lambda' node")) {
                 goto failed;
             }
-            res = obj2ast_int(state, tmp, &is_interpolation, arena);
+            res = obj2ast_int(state, tmp, &sees_class_scope, arena);
             _Py_LeaveRecursiveCall();
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
         }
-        *out = _PyAST_Lambda(args, body, is_interpolation, lineno, col_offset,
+        *out = _PyAST_Lambda(args, body, sees_class_scope, lineno, col_offset,
                              end_lineno, end_col_offset, arena);
         if (*out == NULL) goto failed;
         return 0;
