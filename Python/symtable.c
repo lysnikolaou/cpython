@@ -2209,6 +2209,9 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         VISIT(st, expr, e->v.UnaryOp.operand);
         break;
     case Lambda_kind: {
+        bool is_in_class = st->st_cur->ste_type == ClassBlock;
+        bool add_class_scope = e->v.Lambda.is_interpolation && is_in_class;
+        st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || add_class_scope;
         if (e->v.Lambda.args->defaults)
             VISIT_SEQ(st, expr, e->v.Lambda.args->defaults);
         if (e->v.Lambda.args->kw_defaults)
@@ -2218,27 +2221,9 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
                                   e->lineno, e->col_offset,
                                   e->end_lineno, e->end_col_offset))
             VISIT_QUIT(st, 0);
+        st->st_cur->ste_can_see_class_scope = add_class_scope;
         VISIT(st, arguments, e->v.Lambda.args);
         VISIT(st, expr, e->v.Lambda.body);
-        if (!symtable_exit_block(st))
-            VISIT_QUIT(st, 0);
-        break;
-    }
-    case InterpolationLambda_kind: {
-        bool is_in_class = st->st_cur->ste_type == ClassBlock;
-        st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || is_in_class;
-        if (e->v.InterpolationLambda.args->defaults)
-            VISIT_SEQ(st, expr, e->v.InterpolationLambda.args->defaults);
-        if (e->v.InterpolationLambda.args->kw_defaults)
-            VISIT_SEQ_WITH_NULL(st, expr, e->v.InterpolationLambda.args->kw_defaults);
-        if (!symtable_enter_block(st, &_Py_ID(interpolation_lambda),
-                                  FunctionBlock, (void *)e,
-                                  e->lineno, e->col_offset,
-                                  e->end_lineno, e->end_col_offset))
-            VISIT_QUIT(st, 0);
-        st->st_cur->ste_can_see_class_scope = is_in_class;
-        VISIT(st, arguments, e->v.InterpolationLambda.args);
-        VISIT(st, expr, e->v.InterpolationLambda.body);
         if (!symtable_exit_block(st))
             VISIT_QUIT(st, 0);
         break;

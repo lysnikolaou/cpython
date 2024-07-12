@@ -1034,8 +1034,6 @@ _PyPegen_get_expr_name(expr_ty e)
             return "tuple";
         case Lambda_kind:
             return "lambda";
-        case InterpolationLambda_kind:
-            return "interpolation lambda";
         case Call_kind:
             return "function call";
         case BoolOp_kind:
@@ -1420,7 +1418,7 @@ make_interpolation_lambda(Parser *p, expr_ty arg)
     arguments_ty args = _PyPegen_empty_arguments(p);
     if (args == NULL)
         return NULL;
-    return _PyAST_InterpolationLambda(args, arg,
+    return _PyAST_Lambda(args, arg, 1,
             arg->lineno, arg->col_offset, arg->end_lineno, arg->end_col_offset,
             p->arena);
 }

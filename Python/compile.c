@@ -2988,57 +2988,6 @@ compiler_lambda(struct compiler *c, expr_ty e)
 }
 
 static int
-compiler_interpolation_lambda(struct compiler *c, expr_ty e)
-{
-    PyCodeObject *co;
-    Py_ssize_t funcflags;
-    arguments_ty args = e->v.InterpolationLambda.args;
-    assert(e->kind == InterpolationLambda_kind);
-
-    RETURN_IF_ERROR(compiler_check_debug_args(c, args));
-
-    location loc = LOC(e);
-    funcflags = compiler_default_arguments(c, loc, args);
-    if (funcflags == -1) {
-        return ERROR;
-    }
-
-    _Py_DECLARE_STR(anon_lambda, "<lambda>");
-    RETURN_IF_ERROR(
-        compiler_enter_scope(c, &_Py_STR(anon_lambda), COMPILER_SCOPE_LAMBDA,
-                             (void *)e, e->lineno));
-
-    /* Make None the first constant, so the lambda can't have a
-       docstring. */
-    RETURN_IF_ERROR(compiler_add_const(c->c_const_cache, c->u, Py_None));
-
-    c->u->u_metadata.u_argcount = asdl_seq_LEN(args->args);
-    c->u->u_metadata.u_posonlyargcount = asdl_seq_LEN(args->posonlyargs);
-    c->u->u_metadata.u_kwonlyargcount = asdl_seq_LEN(args->kwonlyargs);
-    VISIT_IN_SCOPE(c, expr, e->v.InterpolationLambda.body);
-    if (c->u->u_ste->ste_generator) {
-        co = optimize_and_assemble(c, 0);
-    }
-    else {
-        location loc = LOC(e->v.InterpolationLambda.body);
-        ADDOP_IN_SCOPE(c, loc, RETURN_VALUE);
-        co = optimize_and_assemble(c, 1);
-    }
-    compiler_exit_scope(c);
-    if (co == NULL) {
-        return ERROR;
-    }
-
-    if (compiler_make_closure(c, loc, co, funcflags) < 0) {
-        Py_DECREF(co);
-        return ERROR;
-    }
-    Py_DECREF(co);
-
-    return SUCCESS;
-}
-
-static int
 compiler_if(struct compiler *c, stmt_ty s)
 {
     jump_target_label next;
@@ -4682,7 +4631,6 @@ infer_type(expr_ty e)
     case GeneratorExp_kind:
         return &PyGen_Type;
     case Lambda_kind:
-    case InterpolationLambda_kind:
         return &PyFunction_Type;
     case JoinedStr_kind:
     case FormattedValue_kind:
@@ -4737,8 +4685,7 @@ check_subscripter(struct compiler *c, expr_ty e)
     case Set_kind:
     case SetComp_kind:
     case GeneratorExp_kind:
-    case Lambda_kind: 
-    case InterpolationLambda_kind: {
+    case Lambda_kind: {
         location loc = LOC(e);
         return compiler_warn(c, loc, "'%.200s' object is not subscriptable; "
                                      "perhaps you missed a comma?",
@@ -6239,8 +6186,6 @@ compiler_visit_expr(struct compiler *c, expr_ty e)
         break;
     case Lambda_kind:
         return compiler_lambda(c, e);
-    case InterpolationLambda_kind:
-        return compiler_interpolation_lambda(c, e);
     case IfExp_kind:
         return compiler_ifexp(c, e);
     case Dict_kind:

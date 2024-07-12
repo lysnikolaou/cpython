@@ -280,10 +280,6 @@ validate_expr(struct validator *state, expr_ty exp, expr_context_ty ctx)
         ret = validate_arguments(state, exp->v.Lambda.args) &&
             validate_expr(state, exp->v.Lambda.body, Load);
         break;
-    case InterpolationLambda_kind:
-        ret = validate_arguments(state, exp->v.InterpolationLambda.args) &&
-            validate_expr(state, exp->v.InterpolationLambda.body, Load);
-        break;
     case IfExp_kind:
         ret = validate_expr(state, exp->v.IfExp.test, Load) &&
             validate_expr(state, exp->v.IfExp.body, Load) &&

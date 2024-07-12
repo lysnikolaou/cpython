@@ -493,7 +493,6 @@ struct _Py_global_strings {
         STRUCT_FOR_ID(insert_pis)
         STRUCT_FOR_ID(instructions)
         STRUCT_FOR_ID(intern)
-        STRUCT_FOR_ID(interpolation_lambda)
         STRUCT_FOR_ID(intersection)
         STRUCT_FOR_ID(interval)
         STRUCT_FOR_ID(is_running)

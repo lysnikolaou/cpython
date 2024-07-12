@@ -95,7 +95,6 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->In_singleton);
     Py_CLEAR(state->In_type);
     Py_CLEAR(state->Interactive_type);
-    Py_CLEAR(state->InterpolationLambda_type);
     Py_CLEAR(state->Interpolation_type);
     Py_CLEAR(state->Invert_singleton);
     Py_CLEAR(state->Invert_type);
@@ -226,6 +225,7 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->id);
     Py_CLEAR(state->ifs);
     Py_CLEAR(state->is_async);
+    Py_CLEAR(state->is_interpolation);
     Py_CLEAR(state->items);
     Py_CLEAR(state->iter);
     Py_CLEAR(state->key);
@@ -334,6 +334,7 @@ static int init_identifiers(struct ast_state *state)
     if ((state->id = PyUnicode_InternFromString("id")) == NULL) return -1;
     if ((state->ifs = PyUnicode_InternFromString("ifs")) == NULL) return -1;
     if ((state->is_async = PyUnicode_InternFromString("is_async")) == NULL) return -1;
+    if ((state->is_interpolation = PyUnicode_InternFromString("is_interpolation")) == NULL) return -1;
     if ((state->items = PyUnicode_InternFromString("items")) == NULL) return -1;
     if ((state->iter = PyUnicode_InternFromString("iter")) == NULL) return -1;
     if ((state->key = PyUnicode_InternFromString("key")) == NULL) return -1;
@@ -580,10 +581,7 @@ static const char * const UnaryOp_fields[]={
 static const char * const Lambda_fields[]={
     "args",
     "body",
-};
-static const char * const InterpolationLambda_fields[]={
-    "args",
-    "body",
+    "is_interpolation",
 };
 static const char * const IfExp_fields[]={
     "test",
@@ -2671,6 +2669,17 @@ add_ast_annotations(struct ast_state *state)
             return 0;
         }
     }
+    {
+        PyObject *type = (PyObject *)&PyLong_Type;
+        Py_INCREF(type);
+        cond = PyDict_SetItemString(Lambda_annotations, "is_interpolation",
+                                    type) == 0;
+        Py_DECREF(type);
+        if (!cond) {
+            Py_DECREF(Lambda_annotations);
+            return 0;
+        }
+    }
     cond = PyObject_SetAttrString(state->Lambda_type, "_field_types",
                                   Lambda_annotations) == 0;
     if (!cond) {
@@ -2684,45 +2693,6 @@ add_ast_annotations(struct ast_state *state)
         return 0;
     }
     Py_DECREF(Lambda_annotations);
-    PyObject *InterpolationLambda_annotations = PyDict_New();
-    if (!InterpolationLambda_annotations) return 0;
-    {
-        PyObject *type = state->arguments_type;
-        Py_INCREF(type);
-        cond = PyDict_SetItemString(InterpolationLambda_annotations, "args",
-                                    type) == 0;
-        Py_DECREF(type);
-        if (!cond) {
-            Py_DECREF(InterpolationLambda_annotations);
-            return 0;
-        }
-    }
-    {
-        PyObject *type = state->expr_type;
-        Py_INCREF(type);
-        cond = PyDict_SetItemString(InterpolationLambda_annotations, "body",
-                                    type) == 0;
-        Py_DECREF(type);
-        if (!cond) {
-            Py_DECREF(InterpolationLambda_annotations);
-            return 0;
-        }
-    }
-    cond = PyObject_SetAttrString(state->InterpolationLambda_type,
-                                  "_field_types",
-                                  InterpolationLambda_annotations) == 0;
-    if (!cond) {
-        Py_DECREF(InterpolationLambda_annotations);
-        return 0;
-    }
-    cond = PyObject_SetAttrString(state->InterpolationLambda_type,
-                                  "__annotations__",
-                                  InterpolationLambda_annotations) == 0;
-    if (!cond) {
-        Py_DECREF(InterpolationLambda_annotations);
-        return 0;
-    }
-    Py_DECREF(InterpolationLambda_annotations);
     PyObject *IfExp_annotations = PyDict_New();
     if (!IfExp_annotations) return 0;
     {
@@ -5972,8 +5942,7 @@ init_types(struct ast_state *state)
         "     | NamedExpr(expr target, expr value)\n"
         "     | BinOp(expr left, operator op, expr right)\n"
         "     | UnaryOp(unaryop op, expr operand)\n"
-        "     | Lambda(arguments args, expr body)\n"
-        "     | InterpolationLambda(arguments args, expr body)\n"
+        "     | Lambda(arguments args, expr body, int is_interpolation)\n"
         "     | IfExp(expr test, expr body, expr orelse)\n"
         "     | Dict(expr* keys, expr* values)\n"
         "     | Set(expr* elts)\n"
@@ -6024,14 +5993,9 @@ init_types(struct ast_state *state)
         "UnaryOp(unaryop op, expr operand)");
     if (!state->UnaryOp_type) return -1;
     state->Lambda_type = make_type(state, "Lambda", state->expr_type,
-                                   Lambda_fields, 2,
-        "Lambda(arguments args, expr body)");
+                                   Lambda_fields, 3,
+        "Lambda(arguments args, expr body, int is_interpolation)");
     if (!state->Lambda_type) return -1;
-    state->InterpolationLambda_type = make_type(state, "InterpolationLambda",
-                                                state->expr_type,
-                                                InterpolationLambda_fields, 2,
-        "InterpolationLambda(arguments args, expr body)");
-    if (!state->InterpolationLambda_type) return -1;
     state->IfExp_type = make_type(state, "IfExp", state->expr_type,
                                   IfExp_fields, 3,
         "IfExp(expr test, expr body, expr orelse)");
@@ -7454,8 +7418,9 @@ _PyAST_UnaryOp(unaryop_ty op, expr_ty operand, int lineno, int col_offset, int
 }
 
 expr_ty
-_PyAST_Lambda(arguments_ty args, expr_ty body, int lineno, int col_offset, int
-              end_lineno, int end_col_offset, PyArena *arena)
+_PyAST_Lambda(arguments_ty args, expr_ty body, int is_interpolation, int
+              lineno, int col_offset, int end_lineno, int end_col_offset,
+              PyArena *arena)
 {
     expr_ty p;
     if (!args) {
@@ -7474,35 +7439,7 @@ _PyAST_Lambda(arguments_ty args, expr_ty body, int lineno, int col_offset, int
     p->kind = Lambda_kind;
     p->v.Lambda.args = args;
     p->v.Lambda.body = body;
-    p->lineno = lineno;
-    p->col_offset = col_offset;
-    p->end_lineno = end_lineno;
-    p->end_col_offset = end_col_offset;
-    return p;
-}
-
-expr_ty
-_PyAST_InterpolationLambda(arguments_ty args, expr_ty body, int lineno, int
-                           col_offset, int end_lineno, int end_col_offset,
-                           PyArena *arena)
-{
-    expr_ty p;
-    if (!args) {
-        PyErr_SetString(PyExc_ValueError,
-                        "field 'args' is required for InterpolationLambda");
-        return NULL;
-    }
-    if (!body) {
-        PyErr_SetString(PyExc_ValueError,
-                        "field 'body' is required for InterpolationLambda");
-        return NULL;
-    }
-    p = (expr_ty)_PyArena_Malloc(arena, sizeof(*p));
-    if (!p)
-        return NULL;
-    p->kind = InterpolationLambda_kind;
-    p->v.InterpolationLambda.args = args;
-    p->v.InterpolationLambda.body = body;
+    p->v.Lambda.is_interpolation = is_interpolation;
     p->lineno = lineno;
     p->col_offset = col_offset;
     p->end_lineno = end_lineno;
@@ -9347,19 +9284,9 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
         if (PyObject_SetAttr(result, state->body, value) == -1)
             goto failed;
         Py_DECREF(value);
-        break;
-    case InterpolationLambda_kind:
-        tp = (PyTypeObject *)state->InterpolationLambda_type;
-        result = PyType_GenericNew(tp, NULL, NULL);
-        if (!result) goto failed;
-        value = ast2obj_arguments(state, vstate, o->v.InterpolationLambda.args);
+        value = ast2obj_int(state, vstate, o->v.Lambda.is_interpolation);
         if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->args, value) == -1)
-            goto failed;
-        Py_DECREF(value);
-        value = ast2obj_expr(state, vstate, o->v.InterpolationLambda.body);
-        if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->body, value) == -1)
+        if (PyObject_SetAttr(result, state->is_interpolation, value) == -1)
             goto failed;
         Py_DECREF(value);
         break;
@@ -13879,6 +13806,7 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
     if (isinstance) {
         arguments_ty args;
         expr_ty body;
+        int is_interpolation;
 
         if (PyObject_GetOptionalAttr(obj, state->args, &tmp) < 0) {
             return -1;
@@ -13914,56 +13842,25 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
         }
-        *out = _PyAST_Lambda(args, body, lineno, col_offset, end_lineno,
-                             end_col_offset, arena);
-        if (*out == NULL) goto failed;
-        return 0;
-    }
-    tp = state->InterpolationLambda_type;
-    isinstance = PyObject_IsInstance(obj, tp);
-    if (isinstance == -1) {
-        return -1;
-    }
-    if (isinstance) {
-        arguments_ty args;
-        expr_ty body;
-
-        if (PyObject_GetOptionalAttr(obj, state->args, &tmp) < 0) {
+        if (PyObject_GetOptionalAttr(obj, state->is_interpolation, &tmp) < 0) {
             return -1;
         }
         if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"args\" missing from InterpolationLambda");
+            PyErr_SetString(PyExc_TypeError, "required field \"is_interpolation\" missing from Lambda");
             return -1;
         }
         else {
             int res;
-            if (_Py_EnterRecursiveCall(" while traversing 'InterpolationLambda' node")) {
+            if (_Py_EnterRecursiveCall(" while traversing 'Lambda' node")) {
                 goto failed;
             }
-            res = obj2ast_arguments(state, tmp, &args, arena);
+            res = obj2ast_int(state, tmp, &is_interpolation, arena);
             _Py_LeaveRecursiveCall();
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
         }
-        if (PyObject_GetOptionalAttr(obj, state->body, &tmp) < 0) {
-            return -1;
-        }
-        if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"body\" missing from InterpolationLambda");
-            return -1;
-        }
-        else {
-            int res;
-            if (_Py_EnterRecursiveCall(" while traversing 'InterpolationLambda' node")) {
-                goto failed;
-            }
-            res = obj2ast_expr(state, tmp, &body, arena);
-            _Py_LeaveRecursiveCall();
-            if (res != 0) goto failed;
-            Py_CLEAR(tmp);
-        }
-        *out = _PyAST_InterpolationLambda(args, body, lineno, col_offset,
-                                          end_lineno, end_col_offset, arena);
+        *out = _PyAST_Lambda(args, body, is_interpolation, lineno, col_offset,
+                             end_lineno, end_col_offset, arena);
         if (*out == NULL) goto failed;
         return 0;
     }
@@ -17980,10 +17877,6 @@ astmodule_exec(PyObject *m)
         return -1;
     }
     if (PyModule_AddObjectRef(m, "Lambda", state->Lambda_type) < 0) {
-        return -1;
-    }
-    if (PyModule_AddObjectRef(m, "InterpolationLambda",
-        state->InterpolationLambda_type) < 0) {
         return -1;
     }
     if (PyModule_AddObjectRef(m, "IfExp", state->IfExp_type) < 0) {

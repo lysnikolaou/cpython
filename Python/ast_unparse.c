@@ -296,20 +296,6 @@ append_ast_lambda(_PyUnicodeWriter *writer, expr_ty e, int level)
 }
 
 static int
-append_ast_interpolation_lambda(_PyUnicodeWriter *writer, expr_ty e, int level)
-{
-    APPEND_STR_IF(level > PR_TEST, "(");
-    Py_ssize_t n_positional = (asdl_seq_LEN(e->v.InterpolationLambda.args->args) +
-                               asdl_seq_LEN(e->v.InterpolationLambda.args->posonlyargs));
-    APPEND_STR(n_positional ? "interpolation_lambda " : "interpolation_lambda");
-    APPEND(args, e->v.InterpolationLambda.args);
-    APPEND_STR(": ");
-    APPEND_EXPR(e->v.InterpolationLambda.body, PR_TEST);
-    APPEND_STR_IF(level > PR_TEST, ")");
-    return 0;
-}
-
-static int
 append_ast_ifexp(_PyUnicodeWriter *writer, expr_ty e, int level)
 {
     APPEND_STR_IF(level > PR_TEST, "(");
@@ -920,8 +906,6 @@ append_ast_expr(_PyUnicodeWriter *writer, expr_ty e, int level)
         return append_ast_unaryop(writer, e, level);
     case Lambda_kind:
         return append_ast_lambda(writer, e, level);
-    case InterpolationLambda_kind:
-        return append_ast_interpolation_lambda(writer, e, level);
     case IfExp_kind:
         return append_ast_ifexp(writer, e, level);
     case Dict_kind:

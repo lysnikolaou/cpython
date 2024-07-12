@@ -76,7 +76,6 @@ struct ast_state {
     PyObject *In_singleton;
     PyObject *In_type;
     PyObject *Interactive_type;
-    PyObject *InterpolationLambda_type;
     PyObject *Interpolation_type;
     PyObject *Invert_singleton;
     PyObject *Invert_type;
@@ -207,6 +206,7 @@ struct ast_state {
     PyObject *id;
     PyObject *ifs;
     PyObject *is_async;
+    PyObject *is_interpolation;
     PyObject *items;
     PyObject *iter;
     PyObject *key;

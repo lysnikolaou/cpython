@@ -857,7 +857,7 @@ group[expr_ty]:
 
 lambdef[expr_ty]:
     | 'lambda' a=[lambda_params] ':' b=expression {
-        _PyAST_Lambda((a) ? a : CHECK(arguments_ty, _PyPegen_empty_arguments(p)), b, EXTRA) }
+        _PyAST_Lambda((a) ? a : CHECK(arguments_ty, _PyPegen_empty_arguments(p)), b, 0, EXTRA) }
 
 lambda_params[arguments_ty]:
     | invalid_lambda_parameters
