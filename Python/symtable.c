@@ -2226,7 +2226,7 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
     }
     case InterpolationLambda_kind: {
         bool is_in_class = st->st_cur->ste_type == ClassBlock;
-        st->st_cur->ste_needs_classdict = is_in_class;
+        st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || is_in_class;
         if (e->v.InterpolationLambda.args->defaults)
             VISIT_SEQ(st, expr, e->v.InterpolationLambda.args->defaults);
         if (e->v.InterpolationLambda.args->kw_defaults)
@@ -2237,7 +2237,6 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
                                   e->end_lineno, e->end_col_offset))
             VISIT_QUIT(st, 0);
         st->st_cur->ste_can_see_class_scope = is_in_class;
-        // st->st_cur->ste_needs_classdict = is_in_class;
         VISIT(st, arguments, e->v.InterpolationLambda.args);
         VISIT(st, expr, e->v.InterpolationLambda.body);
         if (!symtable_exit_block(st))
