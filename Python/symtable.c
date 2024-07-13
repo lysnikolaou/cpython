@@ -2342,7 +2342,7 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
     case Tuple_kind:
         VISIT_SEQ(st, expr, e->v.Tuple.elts);
         break;
-    case Interpolation_kind:
+    case Interpolation_kind: {
         int is_in_class = st->st_cur->ste_type == ClassBlock;
         st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || is_in_class;
         if (!symtable_enter_block(st, &_Py_ID(interpolation),
@@ -2360,6 +2360,7 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         if (!symtable_exit_block(st))
             VISIT_QUIT(st, 0);
         break;
+    }
     case Decoded_kind:
         break;
     }
