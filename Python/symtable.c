@@ -133,6 +133,7 @@ ste_new(struct symtable *st, identifier name, _Py_block_ty block,
     ste->ste_comp_inlined = 0;
     ste->ste_comp_iter_target = 0;
     ste->ste_can_see_class_scope = 0;
+    ste->ste_contains_interpolation = 0;
     ste->ste_comp_iter_expr = 0;
     ste->ste_needs_classdict = 0;
     ste->ste_annotation_block = NULL;
@@ -2209,9 +2210,6 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         VISIT(st, expr, e->v.UnaryOp.operand);
         break;
     case Lambda_kind: {
-        bool is_in_class = st->st_cur->ste_type == ClassBlock;
-        bool add_class_scope = is_in_class && e->v.Lambda.sees_class_scope;
-        st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || add_class_scope;
         if (e->v.Lambda.args->defaults)
             VISIT_SEQ(st, expr, e->v.Lambda.args->defaults);
         if (e->v.Lambda.args->kw_defaults)
@@ -2221,7 +2219,6 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
                                   e->lineno, e->col_offset,
                                   e->end_lineno, e->end_col_offset))
             VISIT_QUIT(st, 0);
-        st->st_cur->ste_can_see_class_scope = add_class_scope;
         VISIT(st, arguments, e->v.Lambda.args);
         VISIT(st, expr, e->v.Lambda.body);
         if (!symtable_exit_block(st))
@@ -2347,12 +2344,22 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
         VISIT_SEQ(st, expr, e->v.Tuple.elts);
         break;
     case Interpolation_kind:
-        VISIT(st, expr, e->v.Interpolation.lambda);
+        int is_in_class = st->st_cur->ste_type == ClassBlock;
+        st->st_cur->ste_needs_classdict = st->st_cur->ste_needs_classdict || is_in_class;
+        if (!symtable_enter_block(st, &_Py_ID(interpolation),
+                                 FunctionBlock, (void *)e,
+                                 e->lineno, e->col_offset,
+                                 e->end_lineno, e->end_col_offset))
+            VISIT_QUIT(st, 0);
+        st->st_cur->ste_can_see_class_scope = is_in_class;
+        VISIT(st, expr, e->v.Interpolation.body);
         VISIT(st, expr, e->v.Interpolation.str);
         if (e->v.Interpolation.conversion)
             VISIT(st, expr, e->v.Interpolation.conversion);
         if (e->v.Interpolation.format_spec)
             VISIT(st, expr, e->v.Interpolation.format_spec);
+        if (!symtable_exit_block(st))
+            VISIT_QUIT(st, 0);
         break;
     case Decoded_kind:
         break;

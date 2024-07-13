@@ -385,7 +385,7 @@ validate_expr(struct validator *state, expr_ty exp, expr_context_ty ctx)
         ret = validate_exprs(state, exp->v.Tuple.elts, ctx, 0);
         break;
     case Interpolation_kind:
-        ret = validate_expr(state, exp->v.Interpolation.lambda, Load) &&
+        ret = validate_expr(state, exp->v.Interpolation.body, Load) &&
               validate_expr(state, exp->v.Interpolation.str, Load) &&
               (exp->v.Interpolation.conversion == NULL ||
                 validate_expr(state, exp->v.Interpolation.conversion, Load)) &&

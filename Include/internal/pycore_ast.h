@@ -392,7 +392,6 @@ struct _expr {
         struct {
             arguments_ty args;
             expr_ty body;
-            int sees_class_scope;
         } Lambda;
 
         struct {
@@ -471,7 +470,7 @@ struct _expr {
         } TagString;
 
         struct {
-            expr_ty lambda;
+            expr_ty body;
             expr_ty str;
             expr_ty conversion;
             expr_ty format_spec;
@@ -801,9 +800,9 @@ expr_ty _PyAST_BinOp(expr_ty left, operator_ty op, expr_ty right, int lineno,
 expr_ty _PyAST_UnaryOp(unaryop_ty op, expr_ty operand, int lineno, int
                        col_offset, int end_lineno, int end_col_offset, PyArena
                        *arena);
-expr_ty _PyAST_Lambda(arguments_ty args, expr_ty body, int sees_class_scope,
-                      int lineno, int col_offset, int end_lineno, int
-                      end_col_offset, PyArena *arena);
+expr_ty _PyAST_Lambda(arguments_ty args, expr_ty body, int lineno, int
+                      col_offset, int end_lineno, int end_col_offset, PyArena
+                      *arena);
 expr_ty _PyAST_IfExp(expr_ty test, expr_ty body, expr_ty orelse, int lineno,
                      int col_offset, int end_lineno, int end_col_offset,
                      PyArena *arena);
@@ -843,7 +842,7 @@ expr_ty _PyAST_JoinedStr(asdl_expr_seq * values, int lineno, int col_offset,
                          int end_lineno, int end_col_offset, PyArena *arena);
 expr_ty _PyAST_TagString(expr_ty tag, expr_ty str, int lineno, int col_offset,
                          int end_lineno, int end_col_offset, PyArena *arena);
-expr_ty _PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion,
+expr_ty _PyAST_Interpolation(expr_ty body, expr_ty str, expr_ty conversion,
                              expr_ty format_spec, int lineno, int col_offset,
                              int end_lineno, int end_col_offset, PyArena
                              *arena);
