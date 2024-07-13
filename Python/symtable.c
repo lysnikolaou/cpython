@@ -133,7 +133,6 @@ ste_new(struct symtable *st, identifier name, _Py_block_ty block,
     ste->ste_comp_inlined = 0;
     ste->ste_comp_iter_target = 0;
     ste->ste_can_see_class_scope = 0;
-    ste->ste_contains_interpolation = 0;
     ste->ste_comp_iter_expr = 0;
     ste->ste_needs_classdict = 0;
     ste->ste_annotation_block = NULL;

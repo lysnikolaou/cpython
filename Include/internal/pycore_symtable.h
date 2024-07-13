@@ -126,7 +126,6 @@ typedef struct _symtable_entry {
     unsigned ste_comp_iter_target : 1; /* true if visiting comprehension target */
     unsigned ste_can_see_class_scope : 1; /* true if this block can see names bound in an
                                              enclosing class scope */
-    unsigned ste_contains_interpolation : 1; /* true if this block contains an interpolation */
     int ste_comp_iter_expr; /* non-zero if visiting a comprehension range expression */
     int ste_lineno;          /* first line of block */
     int ste_col_offset;      /* offset of first line of block */
