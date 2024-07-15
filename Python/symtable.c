@@ -2342,14 +2342,29 @@ symtable_visit_expr(struct symtable *st, expr_ty e)
     case Tuple_kind:
         VISIT_SEQ(st, expr, e->v.Tuple.elts);
         break;
-    case Interpolation_kind:
-        VISIT(st, expr, e->v.Interpolation.lambda);
+    case Interpolation_kind: {
+        int is_in_class = st->st_cur->ste_type == ClassBlock;
+        if (!symtable_enter_block(st, &_Py_ID(interpolation), FunctionBlock, e, LOCATION(e))) {
+            VISIT_QUIT(st, 0);
+        }
+
+        st->st_cur->ste_can_see_class_scope = is_in_class;
+        if (is_in_class && !symtable_add_def(st, &_Py_ID(__classdict__), USE, LOCATION(e))) {
+            VISIT_QUIT(st, 0);
+        }
+
+        VISIT(st, expr, e->v.Interpolation.body);
         VISIT(st, expr, e->v.Interpolation.str);
         if (e->v.Interpolation.conversion)
             VISIT(st, expr, e->v.Interpolation.conversion);
         if (e->v.Interpolation.format_spec)
             VISIT(st, expr, e->v.Interpolation.format_spec);
+
+        if (!symtable_exit_block(st))
+            VISIT_QUIT(st, 0);
+
         break;
+    }
     case Decoded_kind:
         break;
     }

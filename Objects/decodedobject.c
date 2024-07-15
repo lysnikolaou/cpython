@@ -70,7 +70,7 @@ DecodedConcrete_repr(PyObject *s)
 {
     PyObject *left = NULL, *repr = NULL, *right = NULL, *leftrepr = NULL;
     PyObject *final = NULL;
-    
+
     left = PyUnicode_FromString("DecodedConcrete(");
     if (left == NULL) {
         goto exit;

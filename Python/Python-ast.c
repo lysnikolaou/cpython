@@ -237,7 +237,6 @@ void _PyAST_Fini(PyInterpreterState *interp)
     Py_CLEAR(state->kwd_attrs);
     Py_CLEAR(state->kwd_patterns);
     Py_CLEAR(state->kwonlyargs);
-    Py_CLEAR(state->lambda);
     Py_CLEAR(state->left);
     Py_CLEAR(state->level);
     Py_CLEAR(state->lineno);
@@ -344,7 +343,6 @@ static int init_identifiers(struct ast_state *state)
     if ((state->kwd_attrs = PyUnicode_InternFromString("kwd_attrs")) == NULL) return -1;
     if ((state->kwd_patterns = PyUnicode_InternFromString("kwd_patterns")) == NULL) return -1;
     if ((state->kwonlyargs = PyUnicode_InternFromString("kwonlyargs")) == NULL) return -1;
-    if ((state->lambda = PyUnicode_InternFromString("lambda")) == NULL) return -1;
     if ((state->left = PyUnicode_InternFromString("left")) == NULL) return -1;
     if ((state->level = PyUnicode_InternFromString("level")) == NULL) return -1;
     if ((state->lineno = PyUnicode_InternFromString("lineno")) == NULL) return -1;
@@ -641,7 +639,7 @@ static const char * const TagString_fields[]={
     "str",
 };
 static const char * const Interpolation_fields[]={
-    "lambda",
+    "body",
     "str",
     "conversion",
     "format_spec",
@@ -3288,8 +3286,8 @@ add_ast_annotations(struct ast_state *state)
     {
         PyObject *type = state->expr_type;
         Py_INCREF(type);
-        cond = PyDict_SetItemString(Interpolation_annotations, "lambda", type)
-                                    == 0;
+        cond = PyDict_SetItemString(Interpolation_annotations, "body", type) ==
+                                    0;
         Py_DECREF(type);
         if (!cond) {
             Py_DECREF(Interpolation_annotations);
@@ -5944,7 +5942,7 @@ init_types(struct ast_state *state)
         "     | FormattedValue(expr value, int conversion, expr? format_spec)\n"
         "     | JoinedStr(expr* values)\n"
         "     | TagString(expr tag, expr str)\n"
-        "     | Interpolation(expr lambda, expr str, expr? conversion, expr? format_spec)\n"
+        "     | Interpolation(expr body, expr str, expr? conversion, expr? format_spec)\n"
         "     | Decoded(constant value, string? kind)\n"
         "     | Constant(constant value, string? kind)\n"
         "     | Attribute(expr value, identifier attr, expr_context ctx)\n"
@@ -6051,7 +6049,7 @@ init_types(struct ast_state *state)
     state->Interpolation_type = make_type(state, "Interpolation",
                                           state->expr_type,
                                           Interpolation_fields, 4,
-        "Interpolation(expr lambda, expr str, expr? conversion, expr? format_spec)");
+        "Interpolation(expr body, expr str, expr? conversion, expr? format_spec)");
     if (!state->Interpolation_type) return -1;
     if (PyObject_SetAttr(state->Interpolation_type, state->conversion, Py_None)
         == -1)
@@ -7784,14 +7782,14 @@ _PyAST_TagString(expr_ty tag, expr_ty str, int lineno, int col_offset, int
 }
 
 expr_ty
-_PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion, expr_ty
+_PyAST_Interpolation(expr_ty body, expr_ty str, expr_ty conversion, expr_ty
                      format_spec, int lineno, int col_offset, int end_lineno,
                      int end_col_offset, PyArena *arena)
 {
     expr_ty p;
-    if (!lambda) {
+    if (!body) {
         PyErr_SetString(PyExc_ValueError,
-                        "field 'lambda' is required for Interpolation");
+                        "field 'body' is required for Interpolation");
         return NULL;
     }
     if (!str) {
@@ -7803,7 +7801,7 @@ _PyAST_Interpolation(expr_ty lambda, expr_ty str, expr_ty conversion, expr_ty
     if (!p)
         return NULL;
     p->kind = Interpolation_kind;
-    p->v.Interpolation.lambda = lambda;
+    p->v.Interpolation.body = body;
     p->v.Interpolation.str = str;
     p->v.Interpolation.conversion = conversion;
     p->v.Interpolation.format_spec = format_spec;
@@ -9518,9 +9516,9 @@ ast2obj_expr(struct ast_state *state, struct validator *vstate, void* _o)
         tp = (PyTypeObject *)state->Interpolation_type;
         result = PyType_GenericNew(tp, NULL, NULL);
         if (!result) goto failed;
-        value = ast2obj_expr(state, vstate, o->v.Interpolation.lambda);
+        value = ast2obj_expr(state, vstate, o->v.Interpolation.body);
         if (!value) goto failed;
-        if (PyObject_SetAttr(result, state->lambda, value) == -1)
+        if (PyObject_SetAttr(result, state->body, value) == -1)
             goto failed;
         Py_DECREF(value);
         value = ast2obj_expr(state, vstate, o->v.Interpolation.str);
@@ -14804,16 +14802,16 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
         return -1;
     }
     if (isinstance) {
-        expr_ty lambda;
+        expr_ty body;
         expr_ty str;
         expr_ty conversion;
         expr_ty format_spec;
 
-        if (PyObject_GetOptionalAttr(obj, state->lambda, &tmp) < 0) {
+        if (PyObject_GetOptionalAttr(obj, state->body, &tmp) < 0) {
             return -1;
         }
         if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"lambda\" missing from Interpolation");
+            PyErr_SetString(PyExc_TypeError, "required field \"body\" missing from Interpolation");
             return -1;
         }
         else {
@@ -14821,7 +14819,7 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
             if (_Py_EnterRecursiveCall(" while traversing 'Interpolation' node")) {
                 goto failed;
             }
-            res = obj2ast_expr(state, tmp, &lambda, arena);
+            res = obj2ast_expr(state, tmp, &body, arena);
             _Py_LeaveRecursiveCall();
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
@@ -14877,9 +14875,9 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
             if (res != 0) goto failed;
             Py_CLEAR(tmp);
         }
-        *out = _PyAST_Interpolation(lambda, str, conversion, format_spec,
-                                    lineno, col_offset, end_lineno,
-                                    end_col_offset, arena);
+        *out = _PyAST_Interpolation(body, str, conversion, format_spec, lineno,
+                                    col_offset, end_lineno, end_col_offset,
+                                    arena);
         if (*out == NULL) goto failed;
         return 0;
     }

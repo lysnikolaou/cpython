@@ -539,6 +539,7 @@ extern "C" {
 #define _Py_str_literals_INIT { \
     INIT_STR(anon_dictcomp, "<dictcomp>"), \
     INIT_STR(anon_genexpr, "<genexpr>"), \
+    INIT_STR(anon_interpolation, "<interpolation>"), \
     INIT_STR(anon_lambda, "<lambda>"), \
     INIT_STR(anon_listcomp, "<listcomp>"), \
     INIT_STR(anon_module, "<module>"), \
@@ -1002,6 +1003,7 @@ extern "C" {
     INIT_ID(insert_pis), \
     INIT_ID(instructions), \
     INIT_ID(intern), \
+    INIT_ID(interpolation), \
     INIT_ID(intersection), \
     INIT_ID(interval), \
     INIT_ID(is_running), \

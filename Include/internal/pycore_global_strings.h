@@ -30,6 +30,7 @@ struct _Py_global_strings {
     struct {
         STRUCT_FOR_STR(anon_dictcomp, "<dictcomp>")
         STRUCT_FOR_STR(anon_genexpr, "<genexpr>")
+        STRUCT_FOR_STR(anon_interpolation, "<interpolation>")
         STRUCT_FOR_STR(anon_lambda, "<lambda>")
         STRUCT_FOR_STR(anon_listcomp, "<listcomp>")
         STRUCT_FOR_STR(anon_module, "<module>")
@@ -493,6 +494,7 @@ struct _Py_global_strings {
         STRUCT_FOR_ID(insert_pis)
         STRUCT_FOR_ID(instructions)
         STRUCT_FOR_ID(intern)
+        STRUCT_FOR_ID(interpolation)
         STRUCT_FOR_ID(intersection)
         STRUCT_FOR_ID(interval)
         STRUCT_FOR_ID(is_running)

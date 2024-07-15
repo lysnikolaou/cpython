@@ -813,7 +813,7 @@ astfold_expr(expr_ty node_, PyArena *ctx_, _PyASTOptimizeState *state)
         CALL(fold_tuple, expr_ty, node_);
         break;
     case Interpolation_kind:
-        CALL(astfold_expr, expr_ty, node_->v.Interpolation.lambda);
+        CALL(astfold_expr, expr_ty, node_->v.Interpolation.body);
         CALL(astfold_expr, expr_ty, node_->v.Interpolation.str);
         CALL_OPT(astfold_expr, expr_ty, node_->v.Interpolation.conversion);
         CALL_OPT(astfold_expr, expr_ty, node_->v.Interpolation.format_spec);

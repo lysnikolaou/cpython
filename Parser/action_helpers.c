@@ -1412,17 +1412,6 @@ _PyPegen_name_from_f_string_start(Parser *p, Token* t)
                        t->end_col_offset, p->arena);
 }
 
-static expr_ty
-lambdafy(Parser *p, expr_ty arg)
-{
-    arguments_ty args = _PyPegen_empty_arguments(p);
-    if (args == NULL)
-        return NULL;
-    return _PyAST_Lambda(args, arg,
-            arg->lineno, arg->col_offset, arg->end_lineno, arg->end_col_offset,
-            p->arena);
-}
-
 expr_ty
 _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
     expr_ty tag = _PyPegen_name_from_f_string_start(p, a);
@@ -1441,10 +1430,6 @@ _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
             if (value->kind == FormattedValue_kind) {
 
                 expr_ty expr = value->v.FormattedValue.value;
-                expr_ty lambda = lambdafy(p, expr);
-                if (lambda == NULL) {
-                    return NULL;
-                }
 
                 constant rawstr = _PyAST_ExprAsUnicode(expr);
                 if (rawstr == NULL) {
@@ -1475,7 +1460,7 @@ _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
                 }
 
                 expr_ty spec = value->v.FormattedValue.format_spec;
-                expr_ty interpolation = _PyAST_Interpolation(lambda,
+                expr_ty interpolation = _PyAST_Interpolation(expr,
                         raw, conv, spec,
                         value->lineno, value->col_offset,
                         value->end_lineno, value->end_col_offset,
@@ -1604,7 +1589,6 @@ expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, in
             debug_metadata = closing_brace->metadata;
         }
 
-        
         expr_ty debug_text;
         if (debug_as_decoded_ast) {
             debug_text = _PyAST_Decoded(debug_metadata, NULL, lineno, col_offset + 1, debug_end_line,

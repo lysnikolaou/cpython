@@ -132,6 +132,7 @@ enum {
     COMPILER_SCOPE_FUNCTION,
     COMPILER_SCOPE_ASYNC_FUNCTION,
     COMPILER_SCOPE_LAMBDA,
+    COMPILER_SCOPE_INTERPOLATION,
     COMPILER_SCOPE_COMPREHENSION,
     COMPILER_SCOPE_ANNOTATIONS,
 };
@@ -629,7 +630,8 @@ compiler_set_qualname(struct compiler *c)
         if (!force_global) {
             if (parent->u_scope_type == COMPILER_SCOPE_FUNCTION
                 || parent->u_scope_type == COMPILER_SCOPE_ASYNC_FUNCTION
-                || parent->u_scope_type == COMPILER_SCOPE_LAMBDA)
+                || parent->u_scope_type == COMPILER_SCOPE_LAMBDA
+                || parent->u_scope_type == COMPILER_SCOPE_INTERPOLATION)
             {
                 _Py_DECLARE_STR(dot_locals, ".<locals>");
                 base = PyUnicode_Concat(parent->u_metadata.u_qualname,
@@ -5009,9 +5011,43 @@ compiler_joined_str(struct compiler *c, expr_ty e)
 static int
 compiler_interpolation(struct compiler *c, expr_ty e)
 {
+    PyCodeObject *co;
     location loc = LOC(e);
+
+    _Py_DECLARE_STR(anon_interpolation, "<interpolation>");
+    RETURN_IF_ERROR(
+        compiler_enter_scope(c, &_Py_STR(anon_interpolation), COMPILER_SCOPE_INTERPOLATION,
+                             (void *)e, e->lineno));
+
+    /* Make None the first constant, so the interpolation can't have a
+       docstring. */
+    RETURN_IF_ERROR(compiler_add_const(c->c_const_cache, c->u, Py_None));
+
+    c->u->u_metadata.u_argcount = 0;
+    c->u->u_metadata.u_posonlyargcount = 0;
+    c->u->u_metadata.u_kwonlyargcount = 0;
+
+    VISIT_IN_SCOPE(c, expr, e->v.Interpolation.body);
+    if (c->u->u_ste->ste_generator) {
+        co = optimize_and_assemble(c, 0);
+    }
+    else {
+        location loc = LOC(e->v.Interpolation.body);
+        ADDOP_IN_SCOPE(c, loc, RETURN_VALUE);
+        co = optimize_and_assemble(c, 1);
+    }
+    compiler_exit_scope(c);
+    if (co == NULL) {
+        return ERROR;
+    }
+
+    if (compiler_make_closure(c, loc, co, 0) < 0) {
+        Py_DECREF(co);
+        return ERROR;
+    }
+    Py_DECREF(co);
+
     int oparg = 2;
-    VISIT(c, expr, e->v.Interpolation.lambda);
     VISIT(c, expr, e->v.Interpolation.str);
     if (e->v.Interpolation.conversion) {
         VISIT(c, expr, e->v.Interpolation.conversion);
