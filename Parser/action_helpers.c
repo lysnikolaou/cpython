@@ -1589,7 +1589,6 @@ expr_ty _PyPegen_formatted_value(Parser *p, expr_ty expression, Token *debug, in
             debug_metadata = closing_brace->metadata;
         }
 
-        
         expr_ty debug_text;
         if (debug_as_decoded_ast) {
             debug_text = _PyAST_Decoded(debug_metadata, NULL, lineno, col_offset + 1, debug_end_line,
