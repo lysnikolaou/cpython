@@ -5027,7 +5027,6 @@ compiler_interpolation(struct compiler *c, expr_ty e)
     c->u->u_metadata.u_posonlyargcount = 0;
     c->u->u_metadata.u_kwonlyargcount = 0;
 
-    int oparg = 2;
     VISIT_IN_SCOPE(c, expr, e->v.Interpolation.body);
     if (c->u->u_ste->ste_generator) {
         co = optimize_and_assemble(c, 0);
@@ -5047,6 +5046,8 @@ compiler_interpolation(struct compiler *c, expr_ty e)
         return ERROR;
     }
     Py_DECREF(co);
+
+    int oparg = 2;
     VISIT(c, expr, e->v.Interpolation.str);
     if (e->v.Interpolation.conversion) {
         VISIT(c, expr, e->v.Interpolation.conversion);
