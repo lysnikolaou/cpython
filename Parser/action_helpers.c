@@ -1508,6 +1508,12 @@ expr_ty _PyPegen_decoded_from_token(Parser* p, Token* tok) {
         Py_DECREF(str);
         return NULL;
     }
+
+    Py_ssize_t size = PyBytes_Size(tok->bytes);
+    // Check unicode escape string \N{}
+    if (size >= 2 && bstr[size - 2] == '\\' && bstr[size - 1] == 'N') {
+        return _PyAST_Constant(str, NULL, tok->lineno, tok->col_offset, tok->end_lineno, tok->end_col_offset, p->arena);
+    }
     return _PyAST_Decoded(str, NULL, tok->lineno, tok->col_offset,
                            tok->end_lineno, tok->end_col_offset,
                            p->arena);
