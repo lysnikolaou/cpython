@@ -1001,7 +1001,7 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         the_current_tok->f_string_debug = 0;
 
         if (in_tag_string) {
-            the_current_tok->f_string_raw = 1;
+            the_current_tok->f_string_raw = 0;
         }
         else {
             switch (*tok->start) {
