@@ -1422,66 +1422,182 @@ _PyPegen_name_from_f_string_start(Parser *p, Token* t)
 }
 
 expr_ty
+_PyPegen_fold_joined_str(Parser *p, expr_ty joined_str, int lineno, int col_offset,
+                         int end_lineno, int end_col_offset)
+{
+    asdl_expr_seq *seq = joined_str->v.JoinedStr.values;
+    Py_ssize_t n_flattened_elements = asdl_seq_LEN(seq);
+
+    /* calculate folded element count */
+    Py_ssize_t n_elements = 0;
+    int prev_is_decoded = 0;
+    for (Py_ssize_t i = 0; i < n_flattened_elements; i++) {
+        expr_ty elem = asdl_seq_GET(seq, i);
+
+        /* The concatenation of a FormattedValue and an empty Contant should
+           lead to the FormattedValue itself. Thus, we will not take any empty
+           constants into account, just as in `_PyPegen_joined_str` */
+        if (elem->kind == Decoded_kind &&
+            PyUnicode_CheckExact(elem->v.Decoded.value) &&
+            PyUnicode_GET_LENGTH(elem->v.Decoded.value) == 0)
+            continue;
+
+        if (!prev_is_decoded || elem->kind != Decoded_kind) {
+            n_elements++;
+        }
+        prev_is_decoded = elem->kind == Decoded_kind;
+    }
+
+    asdl_expr_seq* values = _Py_asdl_expr_seq_new(n_elements, p->arena);
+    if (values == NULL) {
+        return NULL;
+    }
+
+    /* build folded list */
+    _PyUnicodeWriter writer;
+    Py_ssize_t current_pos = 0;
+    for (Py_ssize_t i = 0; i < n_flattened_elements; i++) {
+        expr_ty elem = asdl_seq_GET(seq, i);
+
+        /* if the current elem and the following are constants,
+           fold them and all consequent constants */
+        if (elem->kind == Decoded_kind) {
+            if (i + 1 < n_flattened_elements &&
+                asdl_seq_GET(seq, i + 1)->kind == Decoded_kind) {
+                expr_ty first_elem = elem;
+
+                /* When a string is getting concatenated, the kind of the string
+                   is determined by the first string in the concatenation
+                   sequence.
+
+                   u"abc" "def" -> u"abcdef"
+                   "abc" u"abc" ->  "abcabc" */
+                PyObject *kind = elem->v.Decoded.kind;
+
+                _PyUnicodeWriter_Init(&writer);
+                expr_ty last_elem = elem;
+                Py_ssize_t j;
+                for (j = i; j < n_flattened_elements; j++) {
+                    expr_ty current_elem = asdl_seq_GET(seq, j);
+                    if (current_elem->kind == Decoded_kind) {
+                        if (_PyUnicodeWriter_WriteStr(
+                                &writer, current_elem->v.Decoded.value)) {
+                            _PyUnicodeWriter_Dealloc(&writer);
+                            return NULL;
+                        }
+                        last_elem = current_elem;
+                    } else {
+                        break;
+                    }
+                }
+                i = j - 1;
+
+                PyObject *concat_str = _PyUnicodeWriter_Finish(&writer);
+                if (concat_str == NULL) {
+                    _PyUnicodeWriter_Dealloc(&writer);
+                    return NULL;
+                }
+                if (_PyArena_AddPyObject(p->arena, concat_str) < 0) {
+                    Py_DECREF(concat_str);
+                    return NULL;
+                }
+                elem = _PyAST_Decoded(concat_str, kind, first_elem->lineno,
+                                       first_elem->col_offset,
+                                       last_elem->end_lineno,
+                                       last_elem->end_col_offset, p->arena);
+                if (elem == NULL) {
+                    return NULL;
+                }
+            }
+
+            /* Drop all empty contanst strings */
+            if (PyUnicode_CheckExact(elem->v.Decoded.value) &&
+                PyUnicode_GET_LENGTH(elem->v.Decoded.value) == 0) {
+                continue;
+            }
+        }
+
+        asdl_seq_SET(values, current_pos++, elem);
+    }
+
+    assert(current_pos == n_elements);
+    return _PyAST_JoinedStr(values, lineno, col_offset, end_lineno, end_col_offset, p->arena);
+}
+
+expr_ty
 _PyPegen_tag_str(Parser *p, Token* a, asdl_expr_seq* raw_expressions, Token*b) {
     expr_ty tag = _PyPegen_name_from_f_string_start(p, a);
     if (tag == NULL) {
         return NULL;
     }
+
     expr_ty str = _PyPegen_joined_str(p, 1, a, raw_expressions, b);
     if (str == NULL) {
         return NULL;
     }
-    if (str->kind == JoinedStr_kind) {
-        asdl_expr_seq *values = str->v.JoinedStr.values;
-        int nvalues = asdl_seq_LEN(values);
-        for (int i = 0; i < nvalues; i++) {
-            expr_ty value = asdl_seq_GET(values, i);
-            if (value->kind == FormattedValue_kind) {
 
-                expr_ty expr = value->v.FormattedValue.value;
+    if (str->kind != JoinedStr_kind) {
+        return _PyAST_TagString(tag, str, a->lineno, a->col_offset,
+                                b->end_lineno, b->end_col_offset,
+                                p->arena);
+    }
 
-                constant rawstr = _PyAST_ExprAsUnicode(expr);
-                if (rawstr == NULL) {
+    expr_ty folded_str = _PyPegen_fold_joined_str(p, str,
+        a->lineno, a->col_offset, b->end_lineno, b->end_col_offset);
+    if (folded_str == NULL) {
+        return NULL;
+    }
+
+    asdl_expr_seq *values = folded_str->v.JoinedStr.values;
+    int nvalues = asdl_seq_LEN(values);
+    for (int i = 0; i < nvalues; i++) {
+        expr_ty value = asdl_seq_GET(values, i);
+        if (value->kind == FormattedValue_kind) {
+
+            expr_ty expr = value->v.FormattedValue.value;
+
+            constant rawstr = _PyAST_ExprAsUnicode(expr);
+            if (rawstr == NULL) {
+                return NULL;
+            }
+            expr_ty raw = _PyAST_Constant(rawstr, NULL,
+                    expr->lineno, expr->col_offset,
+                    expr->end_lineno, expr->end_col_offset,
+                    p->arena);
+            if (raw == NULL) {
+                return NULL;
+            }
+
+            expr_ty conv = NULL;
+            int conversion = value->v.FormattedValue.conversion;
+            if (conversion >= 0) {
+                char buf[1];
+                buf[0] = conversion;
+                constant uconv = _PyUnicode_FromASCII(buf, 1);
+                if (uconv == NULL)
                     return NULL;
-                }
-                expr_ty raw = _PyAST_Constant(rawstr, NULL,
+                conv = _PyAST_Constant(uconv, NULL,
                         expr->lineno, expr->col_offset,
                         expr->end_lineno, expr->end_col_offset,
                         p->arena);
-                if (raw == NULL) {
+                if (conv == NULL)
                     return NULL;
-                }
-
-                expr_ty conv = NULL;
-                int conversion = value->v.FormattedValue.conversion;
-                if (conversion >= 0) {
-                    char buf[1];
-                    buf[0] = conversion;
-                    constant uconv = _PyUnicode_FromASCII(buf, 1);
-                    if (uconv == NULL)
-                        return NULL;
-                    conv = _PyAST_Constant(uconv, NULL,
-                            expr->lineno, expr->col_offset,
-                            expr->end_lineno, expr->end_col_offset,
-                            p->arena);
-                    if (conv == NULL)
-                        return NULL;
-                }
-
-                expr_ty spec = value->v.FormattedValue.format_spec;
-                expr_ty interpolation = _PyAST_Interpolation(expr,
-                        raw, conv, spec,
-                        value->lineno, value->col_offset,
-                        value->end_lineno, value->end_col_offset,
-                        p->arena);
-                if (interpolation == NULL) {
-                    return NULL;
-                }
-                asdl_seq_SET(values, i, interpolation);
             }
+
+            expr_ty spec = value->v.FormattedValue.format_spec;
+            expr_ty interpolation = _PyAST_Interpolation(expr,
+                    raw, conv, spec,
+                    value->lineno, value->col_offset,
+                    value->end_lineno, value->end_col_offset,
+                    p->arena);
+            if (interpolation == NULL) {
+                return NULL;
+            }
+            asdl_seq_SET(values, i, interpolation);
         }
     }
-    return _PyAST_TagString(tag, str, a->lineno, a->col_offset,
+
+    return _PyAST_TagString(tag, folded_str, a->lineno, a->col_offset,
                             b->end_lineno, b->end_col_offset,
                             p->arena);
 }
