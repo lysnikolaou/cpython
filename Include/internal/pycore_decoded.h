@@ -19,7 +19,7 @@ extern PyTypeObject _PyDecodedConcrete_Type;
 extern PyStatus _PyDecoded_InitTypes(PyInterpreterState *);
 extern void _PyDecoded_FiniTypes(PyInterpreterState *);
 
-PyAPI_FUNC(PyObject *) _PyDecodedConcrete_Create(PyObject *s);
+PyAPI_FUNC(PyObject *) _PyDecodedConcrete_FromStackRefSteal(_PyStackRef s);
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,7 @@
 #include "pycore_initconfig.h"    // _PyStatus_OK()
 #include "pycore_object.h"        // _PyObject_GC_TRACK
 #include "pycore_structseq.h"     // _PyStructSequence_FiniBuiltin()
+#include "pycore_stackref.h"      // PyStackRef_AsPyObjectSteal
 
 static PyTypeObject _PyInterpolationConcrete_Type;
 
@@ -45,27 +46,29 @@ _PyInterpolation_FiniTypes(PyInterpreterState *interp)
 }
 
 PyObject *
-_PyInterpolation_Create(PyObject *getvalue, PyObject *expr, PyObject *conv, PyObject *format_spec)
+_PyInterpolation_FromStackRefSteal(_PyStackRef *values, Py_ssize_t n)
 {
+    assert(2 <= n && n <= 4);
+
     PyObject *interpolation = PyStructSequence_New(&_PyInterpolationConcrete_Type);
     if (interpolation == NULL) {
         goto error;
     }
 
-    PyStructSequence_SET_ITEM(interpolation, 0, getvalue);
-    PyStructSequence_SET_ITEM(interpolation, 1, expr);
+    PyStructSequence_SET_ITEM(interpolation, 0, PyStackRef_AsPyObjectSteal(values[0]));
+    PyStructSequence_SET_ITEM(interpolation, 1, PyStackRef_AsPyObjectSteal(values[1]));
     PyStructSequence_SET_ITEM(interpolation, 2,
-        conv != NULL ? conv : Py_NewRef(Py_None));
+        n >= 3 ? PyStackRef_AsPyObjectSteal(values[2]) : Py_NewRef(Py_None));
     PyStructSequence_SET_ITEM(interpolation, 3,
-        format_spec != NULL ? format_spec : Py_NewRef(Py_None));
+        n >= 4 ? PyStackRef_AsPyObjectSteal(values[3]) : Py_NewRef(Py_None));
 
     _PyObject_GC_TRACK(interpolation);
     return (PyObject *)interpolation;
 
 error:
-    Py_DECREF(getvalue);
-    Py_DECREF(expr);
-    Py_XDECREF(conv);
-    Py_XDECREF(format_spec);
+    PyStackRef_CLOSE(values[0]);
+    PyStackRef_CLOSE(values[1]);
+    PyStackRef_XCLOSE(values[2]);
+    PyStackRef_XCLOSE(values[3]);
     return NULL;
 }

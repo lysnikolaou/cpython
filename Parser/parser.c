@@ -25875,7 +25875,7 @@ _loop0_1_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -25942,7 +25942,7 @@ _loop0_2_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -26014,7 +26014,7 @@ _loop1_3_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -26090,7 +26090,7 @@ _loop0_5_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -26667,7 +26667,7 @@ _loop1_14_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -26903,7 +26903,7 @@ _loop0_19_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27020,7 +27020,7 @@ _loop0_21_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27231,7 +27231,7 @@ _loop0_24_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27303,7 +27303,7 @@ _loop1_25_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27379,7 +27379,7 @@ _loop0_27_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27542,7 +27542,7 @@ _loop0_30_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27701,7 +27701,7 @@ _loop1_32_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27909,7 +27909,7 @@ _loop0_36_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -27976,7 +27976,7 @@ _loop0_37_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28043,7 +28043,7 @@ _loop0_38_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28115,7 +28115,7 @@ _loop1_39_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28182,7 +28182,7 @@ _loop0_40_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28254,7 +28254,7 @@ _loop1_41_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28326,7 +28326,7 @@ _loop1_42_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28398,7 +28398,7 @@ _loop1_43_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28465,7 +28465,7 @@ _loop0_44_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28537,7 +28537,7 @@ _loop1_45_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28604,7 +28604,7 @@ _loop0_46_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28676,7 +28676,7 @@ _loop1_47_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28743,7 +28743,7 @@ _loop0_48_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28810,7 +28810,7 @@ _loop0_49_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28882,7 +28882,7 @@ _loop1_50_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -28958,7 +28958,7 @@ _loop0_52_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29075,7 +29075,7 @@ _loop0_54_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29192,7 +29192,7 @@ _loop0_56_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29309,7 +29309,7 @@ _loop0_58_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29498,7 +29498,7 @@ _loop1_60_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29570,7 +29570,7 @@ _loop1_61_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29734,7 +29734,7 @@ _loop1_64_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -29810,7 +29810,7 @@ _loop0_66_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30193,7 +30193,7 @@ _loop0_72_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30310,7 +30310,7 @@ _loop0_74_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30484,7 +30484,7 @@ _loop0_77_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30601,7 +30601,7 @@ _loop0_79_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30718,7 +30718,7 @@ _loop0_81_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30831,7 +30831,7 @@ _loop1_82_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30903,7 +30903,7 @@ _loop1_83_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -30979,7 +30979,7 @@ _loop0_85_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31092,7 +31092,7 @@ _loop1_86_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31164,7 +31164,7 @@ _loop1_87_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31236,7 +31236,7 @@ _loop1_88_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31355,7 +31355,7 @@ _loop0_91_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31851,7 +31851,7 @@ _loop0_98_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31918,7 +31918,7 @@ _loop0_99_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -31985,7 +31985,7 @@ _loop0_100_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32057,7 +32057,7 @@ _loop1_101_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32124,7 +32124,7 @@ _loop0_102_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32196,7 +32196,7 @@ _loop1_103_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32268,7 +32268,7 @@ _loop1_104_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32340,7 +32340,7 @@ _loop1_105_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32407,7 +32407,7 @@ _loop0_106_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32479,7 +32479,7 @@ _loop1_107_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32546,7 +32546,7 @@ _loop0_108_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32618,7 +32618,7 @@ _loop1_109_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32685,7 +32685,7 @@ _loop0_110_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32757,7 +32757,7 @@ _loop1_111_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32824,7 +32824,7 @@ _loop0_112_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32891,7 +32891,7 @@ _loop0_113_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -32958,7 +32958,7 @@ _loop0_114_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33030,7 +33030,7 @@ _loop1_115_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33155,7 +33155,7 @@ _loop0_118_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33268,7 +33268,7 @@ _loop1_119_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33335,7 +33335,7 @@ _loop0_120_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33402,7 +33402,7 @@ _loop0_121_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33537,7 +33537,7 @@ _loop0_124_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33701,7 +33701,7 @@ _loop0_127_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33818,7 +33818,7 @@ _loop0_129_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -33935,7 +33935,7 @@ _loop0_131_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34052,7 +34052,7 @@ _loop0_133_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34160,7 +34160,7 @@ _loop0_134_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34236,7 +34236,7 @@ _loop0_136_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34349,7 +34349,7 @@ _loop1_137_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34465,7 +34465,7 @@ _loop0_140_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34582,7 +34582,7 @@ _loop0_142_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34699,7 +34699,7 @@ _loop0_144_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34816,7 +34816,7 @@ _loop0_146_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -34933,7 +34933,7 @@ _loop0_148_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -35150,7 +35150,7 @@ _loop0_152_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -35897,7 +35897,7 @@ _loop0_163_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -35964,7 +35964,7 @@ _loop0_164_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36031,7 +36031,7 @@ _loop0_165_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36345,7 +36345,7 @@ _loop0_170_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36412,7 +36412,7 @@ _loop0_171_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36479,7 +36479,7 @@ _loop0_172_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36551,7 +36551,7 @@ _loop1_173_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36675,7 +36675,7 @@ _loop0_175_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36799,7 +36799,7 @@ _loop0_177_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -36871,7 +36871,7 @@ _loop1_178_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37112,7 +37112,7 @@ _loop0_182_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37317,7 +37317,7 @@ _loop1_185_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37441,7 +37441,7 @@ _loop0_187_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37508,7 +37508,7 @@ _loop0_188_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37575,7 +37575,7 @@ _loop0_189_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37651,7 +37651,7 @@ _loop0_191_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37816,7 +37816,7 @@ _loop0_193_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -37940,7 +37940,7 @@ _loop0_195_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38012,7 +38012,7 @@ _loop1_196_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38084,7 +38084,7 @@ _loop1_197_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38268,7 +38268,7 @@ _loop0_200_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38598,7 +38598,7 @@ _loop0_206_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38715,7 +38715,7 @@ _loop0_208_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38832,7 +38832,7 @@ _loop0_210_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -38949,7 +38949,7 @@ _loop0_212_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -39066,7 +39066,7 @@ _loop0_214_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -39231,7 +39231,7 @@ _loop0_216_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -39303,7 +39303,7 @@ _loop1_217_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -39411,7 +39411,7 @@ _loop0_219_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -39483,7 +39483,7 @@ _loop1_220_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -40035,7 +40035,7 @@ _loop0_233_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -40567,7 +40567,7 @@ _loop0_241_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -41991,7 +41991,7 @@ _loop0_267_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;
@@ -42335,7 +42335,7 @@ _loop0_275_rule(Parser *p)
         p->level--;
         return NULL;
     }
-    for (int i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
+    for (Py_ssize_t i = 0; i < _n; i++) asdl_seq_SET_UNTYPED(_seq, i, _children[i]);
     PyMem_Free(_children);
     p->level--;
     return _seq;

@@ -1,8 +1,9 @@
 #include "Python.h"
 #include "pycore_initconfig.h"  // _PyStatus_OK
 #include "pycore_typeobject.h"  // _PyStaticType_InitBuiltin
+#include "pycore_stackref.h"    // PyStackRef_AsPyObjectSteal
 #include "pycore_decoded.h"     // PyDecodedObject
-#include "pycore_object.h"        // _PyObject_GC_TRACK
+#include "pycore_object.h"      // _PyObject_GC_TRACK
 
 #include "clinic/decodedobject.c.h"
 
@@ -145,19 +146,16 @@ _PyDecoded_FiniTypes(PyInterpreterState *interp)
 }
 
 PyObject *
-_PyDecodedConcrete_Create(PyObject *s) {
-    if (!PyUnicode_CheckExact(s)) {
-        goto error;
-    }
+_PyDecodedConcrete_FromStackRefSteal(_PyStackRef s) {
+    PyObject *str = PyStackRef_AsPyObjectSteal(s);
 
-    PyObject *res = PyObject_CallFunction((PyObject *) &_PyDecodedConcrete_Type, "O", s);
+    PyObject *res = PyObject_CallFunction((PyObject *) &_PyDecodedConcrete_Type, "O", str);
     if (res == NULL) {
         goto error;
     }
-
     return res;
 
 error:
-    Py_DECREF(s);
+    PyStackRef_CLOSE(s);
     return NULL;
 }

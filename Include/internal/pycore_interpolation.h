@@ -12,11 +12,9 @@ extern "C" {
 extern PyStatus _PyInterpolation_InitTypes(PyInterpreterState *);
 extern void _PyInterpolation_FiniTypes(PyInterpreterState *);
 
-PyAPI_FUNC(PyObject *) _PyInterpolation_Create(
-    PyObject *getvalue,
-    PyObject *expr,
-    PyObject *conv,
-    PyObject *format_spec);
+PyAPI_FUNC(PyObject *) _PyInterpolation_FromStackRefSteal(
+    _PyStackRef *values,
+    Py_ssize_t n);
 
 #ifdef __cplusplus
 }
