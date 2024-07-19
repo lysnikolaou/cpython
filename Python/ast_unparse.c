@@ -640,6 +640,8 @@ append_fstring_element(_PyUnicodeWriter *writer, expr_ty e, bool is_format_spec)
     switch (e->kind) {
     case Constant_kind:
         return append_fstring_unicode(writer, e->v.Constant.value);
+    case JoinedStr_kind:
+        return append_joinedstr(writer, e, is_format_spec, false);
     case FormattedValue_kind:
         return append_formattedvalue(writer, e);
     case Interpolation_kind:
