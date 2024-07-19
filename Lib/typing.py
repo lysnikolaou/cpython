@@ -88,6 +88,8 @@ __all__ = [
     'AsyncContextManager',
 
     # Structural checks, a.k.a. protocols.
+    'Decoded',
+    'Interpolation',
     'Reversible',
     'SupportsAbs',
     'SupportsBytes',

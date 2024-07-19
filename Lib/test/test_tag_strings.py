@@ -65,14 +65,9 @@ class TagStringTests(unittest.TestCase):
         def tag(*args):
             return args
         res = tag"\N{SPACE}"
-        self.assertEqual(len(res), 2)
-        self.assertEqual(res[0], r"\N")
-        func, string, conv, spec = res[1]
-        SPACE = 42
-        self.assertEqual(func(), 42)
-        self.assertEqual(string, "SPACE")
-        self.assertEqual(conv, None)
-        self.assertEqual(spec, None)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0], "\N{SPACE}")
+        self.assertEqual(res[0].raw, r"\N{SPACE}")
 
 
 if __name__ == "__main__":
