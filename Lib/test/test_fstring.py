@@ -1344,8 +1344,10 @@ x = (
         self.assertEqual(f'{3.14:!<10.10}', '3.14!!!!!!')
 
         self.assertAllRaise(SyntaxError, "f-string: expecting '}'",
-                            ["f'{3!'",
-                             "f'{3!s'",
+                            ["f'{3!'"])
+
+        self.assertAllRaise(SyntaxError, "f-string: expecting ':' or '}'",
+                            ["f'{3!s'",
                              "f'{3!g'",
                              ])
 
@@ -1411,18 +1413,21 @@ x = (
                             ["f'{3'",
                              "f'{3!'",
                              "f'{3:'",
-                             "f'{3!s'",
                              "f'{3!s:'",
                              "f'{3!s:3'",
                              "f'x{'",
-                             "f'x{x'",
-                             "f'{x'",
                              "f'{3:s'",
                              "f'{{{'",
                              "f'{{}}{'",
                              "f'{'",
                              "f'{i='",  # See gh-93418.
                              ])
+
+        self.assertAllRaise(SyntaxError, "f-string: expecting ':' or '}'",
+                            ["f'{3!s'"])
+
+        self.assertAllRaise(SyntaxError, "unterminated tag-string literal",
+                            ["f'x{x'", "f'{x'"])
 
         self.assertAllRaise(SyntaxError,
                             "f-string: expecting a valid expression after '{'",

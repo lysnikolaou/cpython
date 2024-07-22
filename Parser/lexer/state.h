@@ -59,6 +59,8 @@ typedef struct _tokenizer_mode {
     char* last_expr_buffer;
     int f_string_debug;
     int in_format_spec;
+
+    int tag_string; // Whether we're in a tag string, used only for error reporting
 } tokenizer_mode;
 
 /* Tokenizer state */

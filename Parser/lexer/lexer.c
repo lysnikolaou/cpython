@@ -999,6 +999,7 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         the_current_tok->last_expr_end = -1;
         the_current_tok->in_format_spec = 0;
         the_current_tok->f_string_debug = 0;
+        the_current_tok->tag_string = in_tag_string;
 
         if (in_tag_string) {
             the_current_tok->f_string_raw = 0;
@@ -1082,7 +1083,8 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
                     tokenizer_mode *the_current_tok = TOK_GET_MODE(tok);
                     if (the_current_tok->f_string_quote == quote &&
                         the_current_tok->f_string_quote_size == quote_size) {
-                        return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "f-string: expecting '}'", start));
+                        return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "%s-string: expecting '}'",
+                            the_current_tok->tag_string ? "tag" : "f"));
                     }
                 }
 
@@ -1211,7 +1213,8 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
     case ']':
     case '}':
         if (INSIDE_FSTRING(tok) && !current_tok->curly_bracket_depth && c == '}') {
-            return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "f-string: single '}' is not allowed"));
+            return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "%s-string: single '}' is not allowed",
+                current_tok->tag_string ? "tag" : "f"));
         }
         if (!tok->tok_extra_tokens && !tok->level) {
             return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "unmatched '%c'", c));
@@ -1231,7 +1234,8 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
                     assert(current_tok->curly_bracket_depth >= 0);
                     int previous_bracket = current_tok->curly_bracket_depth - 1;
                     if (previous_bracket == current_tok->curly_bracket_expr_start_depth) {
-                        return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "f-string: unmatched '%c'", c));
+                        return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "%s-string: unmatched '%c'",
+                            current_tok->tag_string ? "tag" : "f", c));
                     }
                 }
                 if (tok->parenlinenostack[tok->level] != tok->lineno) {
@@ -1252,7 +1256,8 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         if (INSIDE_FSTRING(tok)) {
             current_tok->curly_bracket_depth--;
             if (current_tok->curly_bracket_depth < 0) {
-                return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "f-string: unmatched '%c'", c));
+                return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok, "%s-string: unmatched '%c'",
+                    current_tok->tag_string ? "tag" : "f", c));
             }
             if (c == '}' && current_tok->curly_bracket_depth == current_tok->curly_bracket_expr_start_depth) {
                 current_tok->curly_bracket_expr_start_depth--;
@@ -1380,8 +1385,9 @@ f_string_middle:
 
             if (current_tok->f_string_quote_size == 3) {
                 _PyTokenizer_syntaxerror(tok,
-                                    "unterminated triple-quoted f-string literal"
-                                    " (detected at line %d)", start);
+                                    "unterminated triple-quoted %s-string literal"
+                                    " (detected at line %d)", current_tok->tag_string ? "tag" : "f",
+                                    start);
                 if (c != '\n') {
                     tok->done = E_EOFS;
                 }
@@ -1389,8 +1395,8 @@ f_string_middle:
             }
             else {
                 return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok,
-                                    "unterminated f-string literal (detected at"
-                                    " line %d)", start));
+                                    "unterminated %s-string literal (detected at"
+                                    " line %d)", current_tok->tag_string ? "tag" : "f", start));
             }
         }
 

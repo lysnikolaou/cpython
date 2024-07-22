@@ -2961,11 +2961,12 @@ class Decoded(Protocol):
 
     __slots__ = ()
 
-    def __str__(self) -> str:
-        ...
+    @abstractmethod
+    def __str__(self) -> str: ...
 
-    raw: str
-
+    @property
+    @abstractmethod
+    def raw(self) -> str: ...
 
 @runtime_checkable
 class Interpolation(Protocol):
@@ -2973,18 +2974,26 @@ class Interpolation(Protocol):
 
     __slots__ = ()
 
-    def __len__(self):
-        ...
+    @abstractmethod
+    def __len__(self) -> int: ...
 
-    def __getitem__(self):
-        ...
+    @abstractmethod
+    def __getitem__(self) -> Any: ...
 
-    def getvalue(self) -> Callable[[], Any]:
-        ...
+    @abstractmethod
+    def getvalue(self) -> Callable[[], Any]: ...
 
-    expr: str
-    conv: Literal["a", "r", "s"] | None
-    format_spec: str | None
+    @property
+    @abstractmethod
+    def expr(self) -> str: ...
+
+    @property
+    @abstractmethod
+    def conv(self) -> Literal["a", "r", "s"] | None: ...
+
+    @property
+    @abstractmethod
+    def format_spec(self) -> str | None: ...
 
 
 def _make_nmtuple(name, types, module, defaults = ()):
