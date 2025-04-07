@@ -157,7 +157,7 @@ static PyMemberDef interpolation_members[] = {
 
 PyTypeObject _PyInterpolation_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "templatelib.Interpolation",
+    .tp_name = "string.templatelib.Interpolation",
     .tp_doc = PyDoc_STR("Interpolation object"),
     .tp_basicsize = sizeof(interpolationobject),
     .tp_itemsize = 0,
