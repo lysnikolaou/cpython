@@ -133,7 +133,7 @@ template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             if (!last_was_str) {
                 PyTuple_SET_ITEM(strings, stringsidx++, &_Py_STR(empty));
             }
-            PyTuple_SET_ITEM(interpolations, interpolationsidx, Py_NewRef(item));
+            PyTuple_SET_ITEM(interpolations, interpolationsidx++, Py_NewRef(item));
             last_was_str = 0;
         }
     }
