@@ -337,7 +337,13 @@ template_concat_templates(templateobject *self, templateobject *other)
         return NULL;
     }
 
-    return template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    PyObject *newtemplate = template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    if (newtemplate == NULL) {
+      Py_DECREF(newstrings);
+      Py_DECREF(newinterpolations);
+    }
+
+    return newtemplate;
 }
 
 static PyObject *
@@ -354,7 +360,13 @@ template_concat_template_str(templateobject *self, PyObject *other)
         return NULL;
     }
 
-    return template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    PyObject *newtemplate = template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    if (newtemplate == NULL) {
+        Py_DECREF(newstrings);
+        Py_DECREF(newinterpolations);
+    }
+
+    return newtemplate;
 }
 
 static PyObject *
@@ -371,7 +383,13 @@ template_concat_str_template(templateobject *self, PyObject *other)
         return NULL;
     }
 
-    return template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    PyObject *newtemplate = template_from_strings_interpolations(Py_TYPE(self), newstrings, newinterpolations);
+    if (newtemplate == NULL) {
+        Py_DECREF(newstrings);
+        Py_DECREF(newinterpolations);
+    }
+
+    return newtemplate;
 }
 
 PyObject *
