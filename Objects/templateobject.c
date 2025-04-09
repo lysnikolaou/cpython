@@ -22,7 +22,7 @@ templateiter_next(templateiterobject *self)
     PyObject *item;
     if (self->from_strings) {
         item = PyIter_Next(self->stringsiter);
-        if (PyUnicode_GetLength(item) == 0) {
+        if (PyUnicode_GET_LENGTH(item) == 0) {
             Py_DECREF(item);
             item = PyIter_Next(self->interpolationsiter);
             self->from_strings = 0;
