@@ -22,15 +22,15 @@ templateiter_next(templateiterobject *self)
     PyObject *item;
     if (self->from_strings) {
         item = PyIter_Next(self->stringsiter);
+        self->from_strings = 0;
         if (PyUnicode_GET_LENGTH(item) == 0) {
             Py_SETREF(item, PyIter_Next(self->interpolationsiter));
-            // this gets flipped back to 1 below, so we'll iter strings next
-            self->from_strings = 0;
+            self->from_strings = 1;
         }
     } else {
         item = PyIter_Next(self->interpolationsiter);
+        self->from_strings = 1;
     }
-    self->from_strings = !self->from_strings;
     return item;
 }
 
