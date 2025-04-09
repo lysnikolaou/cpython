@@ -204,11 +204,8 @@ template_from_strings_interpolations(PyTypeObject *type, PyObject *strings, PyOb
         return NULL;
     }
 
-    Py_NewRef(strings);
-    Py_NewRef(interpolations);
-
-    ((templateobject *) template)->strings = strings;
-    ((templateobject *) template)->interpolations = interpolations;
+    ((templateobject *) template)->strings = Py_NewRef(strings);
+    ((templateobject *) template)->interpolations = Py_NewRef(interpolations);
     return template;
 }
 
