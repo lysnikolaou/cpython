@@ -1467,9 +1467,10 @@ _get_interpolation_conversion(Parser *p, Token *debug, ResultTokenWithMetadata *
         Py_UCS4 first = PyUnicode_READ_CHAR(conversion_expr->v.Name.id, 0);
         return Py_SAFE_DOWNCAST(first, Py_UCS4, int);
     }
-    else if (debug && !format) {
-        /* If no conversion is specified, use !r for debug expressions */
-        return (int)'r';
+    else if (debug) {
+        // If no conversion and no format are specified, use !r for debug expressions;
+        // otherwise, if a format is specified, use !s.
+        return format ? (int)'s' : (int)'r';
     }
     return -1;
 }
