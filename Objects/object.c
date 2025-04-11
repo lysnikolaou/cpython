@@ -15,6 +15,8 @@
 #include "pycore_hamt.h"          // _PyHamtItems_Type
 #include "pycore_initconfig.h"    // _PyStatus_OK()
 #include "pycore_instruction_sequence.h" // _PyInstructionSequence_Type
+#include "pycore_interpolation.h" // _PyInterpolation_Type
+#include "pycore_hashtable.h"     // _Py_hashtable_new()
 #include "pycore_list.h"          // _PyList_DebugMallocStats()
 #include "pycore_long.h"          // _PyLong_GetZero()
 #include "pycore_memoryobject.h"  // _PyManagedBuffer_Type
@@ -25,6 +27,7 @@
 #include "pycore_pymem.h"         // _PyMem_IsPtrFreed()
 #include "pycore_pystate.h"       // _PyThreadState_GET()
 #include "pycore_symtable.h"      // PySTEntry_Type
+#include "pycore_template.h"      // _PyTemplate_Type
 #include "pycore_tuple.h"         // _PyTuple_DebugMallocStats()
 #include "pycore_typeobject.h"    // _PyBufferWrapper_Type
 #include "pycore_typevarobject.h" // _PyTypeAlias_Type
@@ -2428,6 +2431,9 @@ static PyTypeObject* static_types[] = {
     &_PyWeakref_RefType,
     &_PyTypeAlias_Type,
     &_PyNoDefault_Type,
+    &_PyInterpolation_Type,
+    &_PyTemplate_Type,
+    &_PyTemplateIter_Type,
 
     // subclasses: _PyTypes_FiniTypes() deallocates them before their base
     // class

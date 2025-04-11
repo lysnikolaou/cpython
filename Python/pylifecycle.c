@@ -33,6 +33,7 @@
 #include "pycore_uniqueid.h"      // _PyObject_FinalizeUniqueIdPool()
 #include "pycore_warnings.h"      // _PyWarnings_InitState()
 #include "pycore_weakref.h"       // _PyWeakref_GET_REF()
+#include "pycore_interpolation.h" // _PyInterpolation_InitTypes()
 
 #include "opcode.h"
 
@@ -750,6 +751,11 @@ pycore_init_types(PyInterpreterState *interp)
     }
 
     status = _PyXI_InitTypes(interp);
+    if (_PyStatus_EXCEPTION(status)) {
+        return status;
+    }
+
+    status = _PyInterpolation_InitTypes(interp);
     if (_PyStatus_EXCEPTION(status)) {
         return status;
     }
