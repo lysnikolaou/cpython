@@ -26,7 +26,7 @@ static struct PyModuleDef_Slot _templatelib_slots[] = {
 static struct PyModuleDef _templatemodule = {
     .m_base = PyModuleDef_HEAD_INIT,
     .m_name = "_templatelib",
-    .m_doc = "Interpreter-internal types for t-string templates.",
+    .m_doc = "Interpreter types for template string literals (t-strings).",
     .m_size = 0,
     .m_slots = _templatelib_slots,
 };
