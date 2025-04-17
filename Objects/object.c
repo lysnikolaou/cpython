@@ -16,7 +16,6 @@
 #include "pycore_initconfig.h"    // _PyStatus_OK()
 #include "pycore_instruction_sequence.h" // _PyInstructionSequence_Type
 #include "pycore_interpolation.h" // _PyInterpolation_Type
-#include "pycore_hashtable.h"     // _Py_hashtable_new()
 #include "pycore_list.h"          // _PyList_DebugMallocStats()
 #include "pycore_long.h"          // _PyLong_GetZero()
 #include "pycore_memoryobject.h"  // _PyManagedBuffer_Type

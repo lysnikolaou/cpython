@@ -1,8 +1,8 @@
 /* interpreter-internal types for string.templatelib */
 
 #include "Python.h"
-#include "pycore_template.h"      // _PyTemplate_Type
 #include "pycore_interpolation.h" // _PyInterpolation_Type
+#include "pycore_template.h"      // _PyTemplate_Type
 
 static int
 _templatelib_exec(PyObject *m)
