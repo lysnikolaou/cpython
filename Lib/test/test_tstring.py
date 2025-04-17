@@ -369,23 +369,26 @@ world"""
 
     def test_error_conditions(self):
         # Test syntax errors
-        with self.assertRaisesRegex(SyntaxError, "'{' was never closed"):
-            eval("t'{")
-
-        with self.assertRaisesRegex(SyntaxError, "t-string: expecting '}'"):
-            eval("t'{a'")
-
-        with self.assertRaisesRegex(SyntaxError, "t-string: single '}' is not allowed"):
-            eval("t'}'")
+        for case, expected_error in (
+            ("t'", "unterminated t-string literal"),
+            ("t'''", "unterminated triple-quoted t-string literal"),
+            ("t''''", "unterminated triple-quoted t-string literal"),
+            ("t'{", "'{' was never closed"),
+            ("t'{'", "t-string: expecting '}'"),
+            ("t'{a'", "t-string: expecting '}'"),
+            ("t'}'", "t-string: single '}' is not allowed"),
+            ("t'{}'", "t-string: valid expression required before '}'"),
+            ("t'{x;y}'", "t-string: expecting '=', or '!', or ':', or '}'"),
+            ("t'{x=y}'", "t-string: expecting '!', or ':', or '}'"),
+            ("t'{x!z}'", "t-string: invalid conversion character 'z': "
+                         "expected 's', 'r', or 'a'"),
+        ):
+            with self.assertRaisesRegex(SyntaxError, expected_error):
+                eval(case)
 
         # Test missing variables
         with self.assertRaises(NameError):
             eval("t'Hello, {name}'")
-
-        # Test invalid conversion
-        num = 1
-        with self.assertRaises(SyntaxError):
-            eval("t'{num!z}'")
 
     def test_literal_concatenation(self):
         # Test concatenation of t-string literals
