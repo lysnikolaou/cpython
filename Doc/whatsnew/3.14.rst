@@ -153,8 +153,9 @@ Writing template handlers is straightforward:
    name = "world"
    assert lower_upper(t"HELLO {name}") == "hello WORLD"
 
-With this in place, developers can write template systems to sanitize SQL, make safe shell operations, improve
-logging, tackle modern ideas in web development (HTML, CSS, etc.), and implement lightweight, custom business DSLs.
+With this in place, developers can write template systems to sanitize SQL, make
+safe shell operations, improve logging, tackle modern ideas in web development
+(HTML, CSS, etc.), and implement lightweight, custom business DSLs.
 
 See :pep:`750` for more details.
 
