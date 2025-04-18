@@ -378,10 +378,20 @@ world"""
             ("t'{a'", "t-string: expecting '}'"),
             ("t'}'", "t-string: single '}' is not allowed"),
             ("t'{}'", "t-string: valid expression required before '}'"),
+            ("t'{=x}'", "t-string: valid expression required before '='"),
+            ("t'{!x}'", "t-string: valid expression required before '!'"),
+            ("t'{:x}'", "t-string: valid expression required before ':'"),
             ("t'{x;y}'", "t-string: expecting '=', or '!', or ':', or '}'"),
             ("t'{x=y}'", "t-string: expecting '!', or ':', or '}'"),
+            ("t'{x!s!}'", "t-string: expecting ':' or '}'"),
+            ("t'{x!s:'", "t-string: expecting '}', or format specs"),
+            ("t'{x!}'", "t-string: missing conversion character"),
+            ("t'{x=!}'", "t-string: missing conversion character"),
             ("t'{x!z}'", "t-string: invalid conversion character 'z': "
                          "expected 's', 'r', or 'a'"),
+            ("t'{lambda:1}'", "t-string: lambda expressions are not allowed "
+                              "without parentheses"),
+            ("t'{x:{;}}'", "t-string: expecting a valid expression after '{'"),
         ):
             with self.assertRaisesRegex(SyntaxError, expected_error):
                 eval(case)
