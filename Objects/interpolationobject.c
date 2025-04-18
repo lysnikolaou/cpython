@@ -13,8 +13,8 @@ _conversion_converter(PyObject *arg, PyObject **conversion)
 
     if (!PyUnicode_Check(arg)) {
         PyErr_Format(PyExc_TypeError,
-            "%.200s() %.200s must be %.50s, not %T",
-            "Interpolation", "argument 'conversion'", "str", arg);
+            "Interpolation() argument 'conversion' must be str, not %T",
+            arg);
         return 0;
     }
 
