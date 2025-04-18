@@ -66,6 +66,7 @@ Summary -- release highlights
 
 * :ref:`PEP 649: deferred evaluation of annotations <whatsnew314-pep649>`
 * :ref:`PEP 741: Python Configuration C API <whatsnew314-pep741>`
+* :ref:`PEP 750: Template Strings <whatsnew314-pep750>`
 * :ref:`PEP 758: Allow except and except* expressions without parentheses <whatsnew314-pep758>`
 * :ref:`PEP 761: Discontinuation of PGP signatures <whatsnew314-pep761>`
 * :ref:`PEP 765: Disallow return/break/continue that exit a finally block <whatsnew314-pep765>`
@@ -92,62 +93,68 @@ If you encounter :exc:`NameError`\s or pickling errors coming out of
 New features
 ============
 
-.. _whatsnew314-pep768:
+.. _whatsnew314-pep750:
 
-PEP 768: Safe external debugger interface for CPython
------------------------------------------------------
+PEP 750: Template Strings
+-------------------------
 
-:pep:`768` introduces a zero-overhead debugging interface that allows debuggers and profilers
-to safely attach to running Python processes. This is a significant enhancement to Python's
-debugging capabilities allowing debuggers to forego unsafe alternatives.
+Template strings are a generalization of f-strings, using a ``t`` in place of the ``f`` prefix. Instead of evaluating
+to ``str``, t-strings evaluate to a new ``Template`` type:
 
-The new interface provides safe execution points for attaching debugger code without modifying
-the interpreter's normal execution path or adding runtime overhead. This enables tools to
-inspect and interact with Python applications in real-time without stopping or restarting
-them — a crucial capability for high-availability systems and production environments.
+.. code-block:: python
 
-For convenience, CPython implements this interface through the :mod:`sys` module with a
-:func:`sys.remote_exec` function::
+   from string.templatelib import Template
 
-    sys.remote_exec(pid, script_path)
+   name = "World"
+   template: Template = t"Hello {name}"
 
-This function allows sending Python code to be executed in a target process at the next safe
-execution point. However, tool authors can also implement the protocol directly as described
-in the PEP, which details the underlying mechanisms used to safely attach to running processes.
+The template can then be combined with functions that operate on the template's structure to produce an `str` or a
+string-like result. For example, sanitizing input:
 
-Here's a simple example that inspects object types in a running Python process:
+.. code-block:: python
 
-  .. code-block:: python
+   evil = "<script>alert('evil')</script>"
+   template = t"<p>{evil}</p>"
+   assert html(template) == "<p>&lt;script&gt;alert('evil')&lt;/script&gt;</p>"
 
-     import os
-     import sys
-     import tempfile
+As another example, generating HTML attributes from data:
 
-     # Create a temporary script
-     with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-         script_path = f.name
-         f.write(f"import my_debugger; my_debugger.connect({os.getpid()})")
-     try:
-         # Execute in process with PID 1234
-         print("Behold! An offering:")
-         sys.remote_exec(1234, script_path)
-     finally:
-         os.unlink(script_path)
+.. code-block::
 
-The debugging interface has been carefully designed with security in mind and includes several
-mechanisms to control access:
+   attributes = {"src": "shrubbery.jpg", "alt": "looks nice"}
+   template = t"<img {attributes} />"
+   assert html(template) == '<img src="shrubbery.jpg" alt="looks nice" class="looks-nice" />'
 
-* A :envvar:`PYTHON_DISABLE_REMOTE_DEBUG` environment variable.
-* A :option:`-X disable-remote-debug` command-line option.
-* A :option:`--without-remote-debug` configure flag to completely disable the feature at build time.
+Unlike f-strings, the `html()` function has access to template attributes containing the original information: static
+strings, interpolations, and values from the original scope. Unlike existing templating approaches, t-strings build
+from the well-known f-string syntax and rules. Template systems thus benefit from Python tooling as they are much
+closer to the Python language, syntax, scoping, and more.
 
-A key implementation detail is that the interface piggybacks on the interpreter's existing evaluation
-loop and safe points, ensuring zero overhead during normal execution while providing a reliable way
-for external processes to coordinate debugging operations.
+Writing template handlers is straightforward:
 
-See :pep:`768` for more details.
+.. code-block:: python
 
-(Contributed by Pablo Galindo Salgado, Matt Wozniski, and Ivona Stojanovic in :gh:`131591`.)
+   from string.templatelib import Template, Interpolation
+
+   def lower_upper(template: Template) -> str:
+       """Render static parts lowercased and interpolations uppercased."""
+       parts: list[str] = []
+       for item in template:
+           if isinstance(item, Interpolation):
+               parts.append(str(item.value).upper())
+           else:
+               parts.append(item.lower())
+       return "".join(parts)
+
+   name = "world"
+   assert lower_upper(t"HELLO {name}") == "hello WORLD"
+
+With this in place, developers can write template systems to sanitize SQL, make safe shell operations, improve
+logging, tackle modern ideas in web development (HTML, CSS, etc.), and implement lightweight, custom business DSLs.
+
+See :pep:`750` for more details.
+
+(Contributed by Jim Baker, Guido van Rossum, Paul Everitt, Koudai Aono, Lysandros Nikolaou, and Dave Peck in :gh:`132661`.)
 
 .. _whatsnew314-pep758:
 
@@ -175,6 +182,31 @@ Check :pep:`758` for more details.
 
 (Contributed by Pablo Galindo and Brett Cannon in :gh:`131831`.)
 
+.. _whatsnew314-pep758:
+
+PEP 758 – Allow except and except* expressions without parentheses
+------------------------------------------------------------------
+
+The :keyword:`except` and :keyword:`except* <except_star>` expressions now allow
+parentheses to be omitted when there are multiple exception types and the ``as`` clause is not used.
+For example the following expressions are now valid:
+
+.. code-block:: python
+
+   try:
+       release_new_sleep_token_album()
+   except AlbumNotFound, SongsTooGoodToBeReleased:
+       print("Sorry, no new album this year.")
+
+    # The same applies to except* (for exception groups):
+   try:
+       release_new_sleep_token_album()
+   except* AlbumNotFound, SongsTooGoodToBeReleased:
+       print("Sorry, no new album this year.")
+
+Check :pep:`758` for more details.
+
+(Contributed by Pablo Galindo and Brett Cannon in :gh:`131831`.)
 
 .. _whatsnew314-pep649:
 
