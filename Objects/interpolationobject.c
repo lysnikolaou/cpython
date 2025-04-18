@@ -217,5 +217,5 @@ _PyInterpolation_FromStackRefStealOnSuccess(_PyStackRef *values)
 PyObject *
 _PyInterpolation_GetValue(PyObject *interpolation)
 {
-    return ((interpolationobject *) interpolation)->value;
+    return interpolationobject_CAST(interpolation)->value;
 }
