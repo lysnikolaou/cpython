@@ -13,8 +13,7 @@ extern "C" {
 
 extern PyTypeObject _PyInterpolation_Type;
 
-#define _PyInterpolation_Check(op) PyObject_TypeCheck((op), &_PyInterpolation_Type)
-#define _PyInterpolation_CheckExact(op) Py_IS_TYPE((op), &_PyInterpolation_Type)
+#define _PyInterpolation_Check(op) Py_IS_TYPE((op), &_PyInterpolation_Type)
 
 PyAPI_FUNC(PyObject *) _PyInterpolation_FromStackRefStealOnSuccess(_PyStackRef *values);
 

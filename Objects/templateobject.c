@@ -67,6 +67,9 @@ typedef struct {
     PyObject *interpolations;
 } templateobject;
 
+#define templateobject_CAST(op) \
+    (assert(_PyTemplate_Check(op)), _Py_CAST(templateobject*, (op)))
+
 static templateobject *
 template_from_strings_interpolations(PyTypeObject *type, PyObject *strings, PyObject *interpolations)
 {
@@ -80,7 +83,7 @@ template_from_strings_interpolations(PyTypeObject *type, PyObject *strings, PyOb
     return template;
 }
 
-static templateobject *
+static PyObject *
 template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     if (kwds != NULL) {
@@ -164,12 +167,13 @@ template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     templateobject *template = template_from_strings_interpolations(type, strings, interpolations);
     Py_DECREF(strings);
     Py_DECREF(interpolations);
-    return template;
+    return (PyObject *)template;
 }
 
 static void
-template_dealloc(templateobject *self)
+template_dealloc(PyObject *op)
 {
+    templateobject *self = templateobject_CAST(op);
     PyObject_GC_UnTrack(self);
     Py_CLEAR(self->strings);
     Py_CLEAR(self->interpolations);
@@ -177,25 +181,28 @@ template_dealloc(templateobject *self)
 }
 
 static int
-template_traverse(templateobject *self, visitproc visit, void *arg)
+template_traverse(PyObject *op, visitproc visit, void *arg)
 {
+    templateobject *self = templateobject_CAST(op);
     Py_VISIT(self->strings);
     Py_VISIT(self->interpolations);
     return 0;
 }
 
 static PyObject *
-template_repr(templateobject *self)
+template_repr(PyObject *op)
 {
+    templateobject *self = templateobject_CAST(op);
     return PyUnicode_FromFormat("%s(strings=%R, interpolations=%R)",
                                 _PyType_Name(Py_TYPE(self)),
                                 self->strings,
                                 self->interpolations);
 }
 
-static templateiterobject *
-template_iter(templateobject *self)
+static PyObject *
+template_iter(PyObject *op)
 {
+    templateobject *self = templateobject_CAST(op);
     templateiterobject *iter = PyObject_GC_New(templateiterobject, &_PyTemplateIter_Type);
     if (iter == NULL) {
         return NULL;
@@ -218,7 +225,7 @@ template_iter(templateobject *self)
     iter->interpolationsiter = interpolationsiter;
     iter->from_strings = 1;
     PyObject_GC_Track(iter);
-    return iter;
+    return (PyObject *)iter;
 }
 
 static PyObject *
@@ -413,8 +420,9 @@ _PyTemplate_Concat(PyObject *self, PyObject *other)
 }
 
 static PyObject *
-template_values_get(templateobject *self, void *Py_UNUSED(data))
+template_values_get(PyObject *op, void *Py_UNUSED(data))
 {
+    templateobject *self = templateobject_CAST(op);
     PyObject *values = PyTuple_New(PyTuple_GET_SIZE(self->interpolations));
     if (values == NULL) {
         return NULL;
@@ -448,7 +456,7 @@ static PyMemberDef template_members[] = {
 };
 
 static PyGetSetDef template_getset[] = {
-    {"values", (getter) template_values_get, NULL, "Values of interpolations", NULL},
+    {"values", template_values_get, NULL, "Values of interpolations", NULL},
     {NULL},
 };
 
@@ -464,15 +472,15 @@ PyTypeObject _PyTemplate_Type = {
     .tp_itemsize = 0,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
     .tp_as_sequence = &template_as_sequence,
-    .tp_new = (newfunc) template_new,
+    .tp_new = template_new,
     .tp_alloc = PyType_GenericAlloc,
-    .tp_dealloc = (destructor) template_dealloc,
+    .tp_dealloc = template_dealloc,
     .tp_free = PyObject_GC_Del,
-    .tp_repr = (reprfunc) template_repr,
+    .tp_repr = template_repr,
     .tp_members = template_members,
     .tp_getset = template_getset,
-    .tp_iter = (getiterfunc) template_iter,
-    .tp_traverse = (traverseproc) template_traverse,
+    .tp_iter = template_iter,
+    .tp_traverse = template_traverse,
 };
 
 PyObject *
