@@ -13,9 +13,8 @@ _conversion_converter(PyObject *arg, PyObject **conversion)
 
     if (!PyUnicode_Check(arg)) {
         PyErr_Format(PyExc_TypeError,
-            "%.200s() %.200s must be %.50s, not %.50s",
-            "Interpolation", "argument 'conversion'", "str",
-            arg == Py_None ? "None" : Py_TYPE(arg)->tp_name);
+            "%.200s() %.200s must be %.50s, not %T",
+            "Interpolation", "argument 'conversion'", "str", arg);
         return 0;
     }
 
@@ -104,9 +103,8 @@ static PyObject *
 interpolation_repr(PyObject *op)
 {
     interpolationobject *self = interpolationobject_CAST(op);
-    return PyUnicode_FromFormat("%s(%R, %R, %R, %R)",
-                                _PyType_Name(Py_TYPE(self)),
-                                self->value, self->expression,
+    return PyUnicode_FromFormat("%T(%R, %R, %R, %R)",
+                                self, self->value, self->expression,
                                 self->conversion, self->format_spec);
 }
 
