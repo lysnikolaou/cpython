@@ -367,9 +367,8 @@ world"""
         self.assertIsInstance(tree.body[0].value.values[0], ast.Constant)
         self.assertIsInstance(tree.body[0].value.values[1], ast.Interpolation)
 
-    def test_error_conditions(self):
-        # Test syntax errors
-        for case, expected_error in (
+    def test_syntax_errors(self):
+        for case, err in (
             ("t'", "unterminated t-string literal"),
             ("t'''", "unterminated triple-quoted t-string literal"),
             ("t''''", "unterminated triple-quoted t-string literal"),
@@ -393,9 +392,10 @@ world"""
                               "without parentheses"),
             ("t'{x:{;}}'", "t-string: expecting a valid expression after '{'"),
         ):
-            with self.assertRaisesRegex(SyntaxError, expected_error):
+            with self.subTest(case), self.assertRaisesRegex(SyntaxError, err):
                 eval(case)
 
+    def test_runtime_errors(self):
         # Test missing variables
         with self.assertRaises(NameError):
             eval("t'Hello, {name}'")
