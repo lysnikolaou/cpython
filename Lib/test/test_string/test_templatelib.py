@@ -8,7 +8,7 @@ class TestTemplate(TStringTestCase):
     def test_basic_creation(self):
         # Simple t-string creation
         t = t'Hello, world'
-        self.assertTrue(isinstance(t, Template))
+        self.assertIsInstance(t, Template)
         self.assertTStringEqual(t, ('Hello, world',), ())
         self.assertEqual(f(t), 'Hello, world')
 
