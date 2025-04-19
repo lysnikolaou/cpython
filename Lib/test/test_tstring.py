@@ -1,37 +1,15 @@
 import ast
 import unittest
 
-from test.test_string._support import f
+from test.test_string._support import TStringTestCase, f
 
 
-class TestTString(unittest.TestCase):
+class TestTString(TStringTestCase):
     def assertAllRaise(self, exception_type, regex, error_strings):
         for s in error_strings:
             with self.subTest(s=s):
                 with self.assertRaisesRegex(exception_type, regex):
                     eval(s)
-
-    def assertTStringEqual(self, t, strings, interpolations):
-        """Test template string literal equality.
-
-        The *strings* argument must be a tuple of strings equal to *t.strings*.
-
-        The *interpolations* argument must be a sequence of tuples which are
-        compared against *t.interpolations*. Each tuple consists of
-        (value, expression, conversion, format_spec), though the final two
-        items may be omitted, and are assumed to be None and '' respectively.
-        """
-        self.assertEqual(t.strings, strings)
-        self.assertEqual(len(t.interpolations), len(interpolations))
-
-        for actual, expected in zip(t.interpolations, interpolations,
-                                    strict=True):
-            if len(expected) == 2:
-                self.assertEqual(tuple(actual), expected + (None, ''))
-            elif len(expected) == 3:
-                self.assertEqual(tuple(actual), expected + ('',))
-            else:
-                self.assertEqual(tuple(actual), expected)
 
     def test_string_representation(self):
         # Test __repr__
