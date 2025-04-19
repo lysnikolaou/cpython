@@ -16,14 +16,14 @@ class TStringTestCase(unittest.TestCase):
         self.assertEqual(t.strings, strings)
         self.assertEqual(len(t.interpolations), len(interpolations))
 
-        for actual, expected in zip(t.interpolations, interpolations,
-                                    strict=True):
+        for i, expected in zip(t.interpolations, interpolations, strict=True):
+            actual = (i.value, i.expression, i.conversion, i.format_spec)
             if len(expected) == 2:
-                self.assertEqual(tuple(actual), expected + (None, ''))
+                self.assertEqual(actual, expected + (None, ''))
             elif len(expected) == 3:
-                self.assertEqual(tuple(actual), expected + ('',))
+                self.assertEqual(actual, expected + ('',))
             else:
-                self.assertEqual(tuple(actual), expected)
+                self.assertEqual(actual, expected)
 
 
 def convert(value, conversion):
