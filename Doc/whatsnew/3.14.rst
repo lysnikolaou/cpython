@@ -110,7 +110,7 @@ to :class:`str`, t-strings evaluate to a new :class:`string.templatelib.Template
    template: Template = t"Hello {name}"
 
 The template can then be combined with functions that operate on the template's
-structure to produce an `str` or a string-like result.
+structure to produce a :class:`str` or a string-like result.
 For example, sanitizing input:
 
 .. code-block:: python
