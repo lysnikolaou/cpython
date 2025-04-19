@@ -29,7 +29,7 @@ class TStringTestCase(unittest.TestCase):
 
             self.assertEqual((i.value, i.expression), exp)
             self.assertEqual(i.format_spec, '')
-            self.assertEqual(i.conversion, None)
+            self.assertIsNone(i.conversion)
 
 
 def convert(value, conversion):
