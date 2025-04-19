@@ -46,7 +46,7 @@ typedef struct {
 } interpolationobject;
 
 #define interpolationobject_CAST(op) \
-    (assert(_PyInterpolation_Check(op)), _Py_CAST(interpolationobject*, (op)))
+    (assert(_PyInterpolation_CheckExact(op)), _Py_CAST(interpolationobject*, (op)))
 
 /*[clinic input]
 @classmethod

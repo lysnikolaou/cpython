@@ -1,7 +1,7 @@
 /* t-string Template object implementation */
 
 #include "Python.h"
-#include "pycore_interpolation.h" // _PyInterpolation_Check()
+#include "pycore_interpolation.h" // _PyInterpolation_CheckExact()
 #include "pycore_template.h"
 
 typedef struct {
@@ -68,7 +68,7 @@ typedef struct {
 } templateobject;
 
 #define templateobject_CAST(op) \
-    (assert(_PyTemplate_Check(op)), _Py_CAST(templateobject*, (op)))
+    (assert(_PyTemplate_CheckExact(op)), _Py_CAST(templateobject*, (op)))
 
 static templateobject *
 template_from_strings_interpolations(PyTypeObject *type, PyObject *strings, PyObject *interpolations)
@@ -104,7 +104,7 @@ template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             }
             last_was_str = 1;
         }
-        else if (_PyInterpolation_Check(item)) {
+        else if (_PyInterpolation_CheckExact(item)) {
             if (!last_was_str) {
                 stringslen++;
             }
@@ -152,7 +152,7 @@ template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             }
             last_was_str = 1;
         }
-        else if (_PyInterpolation_Check(item)) {
+        else if (_PyInterpolation_CheckExact(item)) {
             if (!last_was_str) {
                 PyTuple_SET_ITEM(strings, stringsidx++, &_Py_STR(empty));
             }
@@ -405,13 +405,13 @@ template_concat_str_template(templateobject *self, PyObject *other)
 PyObject *
 _PyTemplate_Concat(PyObject *self, PyObject *other)
 {
-    if (_PyTemplate_Check(self) && _PyTemplate_Check(other)) {
+    if (_PyTemplate_CheckExact(self) && _PyTemplate_CheckExact(other)) {
         return template_concat_templates((templateobject *) self, (templateobject *) other);
     }
-    else if ((_PyTemplate_Check(self)) && PyUnicode_Check(other)) {
+    else if ((_PyTemplate_CheckExact(self)) && PyUnicode_Check(other)) {
         return template_concat_template_str((templateobject *) self, other);
     }
-    else if (PyUnicode_Check(self) && (_PyTemplate_Check(other))) {
+    else if (PyUnicode_Check(self) && (_PyTemplate_CheckExact(other))) {
         return template_concat_str_template((templateobject *) other, self);
     }
     else {
