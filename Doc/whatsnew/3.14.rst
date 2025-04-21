@@ -121,7 +121,7 @@ For example, sanitizing input:
 
 As another example, generating HTML attributes from data:
 
-.. code-block::
+.. code-block:: python
 
    attributes = {"src": "shrubbery.jpg", "alt": "looks nice"}
    template = t"<img {attributes} />"
