@@ -116,8 +116,8 @@ template_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         else {
             PyErr_Format(
                 PyExc_TypeError,
-                "Template.__new__ *args need to be of type 'str' or 'Interpolation', got %.200s",
-                Py_TYPE(item)->tp_name);
+                "Template.__new__ *args need to be of type 'str' or 'Interpolation', got %T",
+                item);
             return NULL;
         }
     }
@@ -443,7 +443,7 @@ template_reduce(PyObject *op, PyObject *Py_UNUSED(dummy))
         return NULL;
     }
 
-    templateobject *self = (templateobject *)op;
+    templateobject *self = templateobject_CAST(op);
     PyObject *result = Py_BuildValue("O(OO)",
                                      func,
                                      self->strings,

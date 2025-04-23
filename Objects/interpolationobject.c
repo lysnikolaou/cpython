@@ -128,7 +128,7 @@ static PyMemberDef interpolation_members[] = {
 static PyObject*
 interpolation_reduce(PyObject *op, PyObject *Py_UNUSED(dummy))
 {
-    interpolationobject *self = (interpolationobject *)op;
+    interpolationobject *self = interpolationobject_CAST(op);
     return Py_BuildValue("(O(OOOO))", (PyObject *)Py_TYPE(op),
                          self->value, self->expression,
                          self->conversion, self->format_spec);
