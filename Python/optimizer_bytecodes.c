@@ -422,6 +422,12 @@ dummy_func(void) {
         ss = sub_st;
     }
 
+    op(_BINARY_OP_SUBSCR_LIST_SLICE, (list_st, sub_st -- res, ls, ss)) {
+        res = sym_new_type(ctx, &PyList_Type);
+        ls = list_st;
+        ss = sub_st;
+    }
+
     op(_TO_BOOL, (value -- res)) {
         int already_bool = optimize_to_bool(this_instr, ctx, value, &res, false);
         if (!already_bool) {
@@ -1372,6 +1378,13 @@ dummy_func(void) {
         {
             ADD_OP(_NOP, 0, 0);
         }
+    }
+
+    op(_GUARD_TOS_SLICE, (tos -- tos)) {
+        if (sym_matches_type(tos, &PySlice_Type)) {
+            ADD_OP(_NOP, 0, 0);
+        }
+        sym_set_type(tos, &PySlice_Type);
     }
 
     op(_GUARD_NOS_NULL, (null, unused -- null, unused)) {
