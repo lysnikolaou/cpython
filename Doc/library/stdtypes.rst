@@ -1484,8 +1484,8 @@ The following operations return new objects and appear
    x * lst        # repeats lst x times into a new list
    lst.copy()     # returns a shallow copy of the list
 
-Methods that only operate on a single elements with no shifting required are
-:term:`atomic <atomic operation>`:
+The following methods that only operate on a single element with no shifting
+required are :term:`atomic <atomic operation>`:
 
 .. code-block::
    :class: good
