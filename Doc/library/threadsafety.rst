@@ -1,8 +1,8 @@
 .. _threadsafety:
 
-******************************
+************************
 Thread Safety Guarantees
-******************************
+************************
 
 This page documents thread-safety guarantees for built-in types in Python's
 free-threaded build. The guarantees described here apply when using Python with
@@ -16,13 +16,13 @@ For general guidance on writing thread-safe code in free-threaded Python, see
 .. _thread-safety-list:
 
 Thread safety for list objects
-================================
+==============================
 
 Reading a single element from a :class:`list` is
 :term:`atomic <atomic operation>`:
 
 .. code-block::
-   :class: green
+   :class: good
 
    lst[i]   # list.__getitem__
 
@@ -124,7 +124,7 @@ across threads.
 .. _thread-safety-dict:
 
 Thread safety for dict objects
-================================
+==============================
 
 Creating a dictionary with the :class:`dict` constructor is atomic when the
 argument to it is a :class:`dict` or a :class:`tuple`. When using the
