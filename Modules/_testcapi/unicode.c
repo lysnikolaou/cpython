@@ -244,45 +244,48 @@ unicode_case_operation(PyObject *str, Py_ssize_t (*function)(Py_UCS4, Py_UCS4 *,
     return PyUnicode_FromKindAndData(PyUnicode_4BYTE_KIND, buf, chars);
 }
 
-/* Test PyUCS4_ToLower() */
+/* Test PyUnstable_UCS4_ToLower() */
 static PyObject *
 unicode_tolower(PyObject *self, PyObject *arg)
 {
-    Py_UCS4 buf[PyUCS4_CASE_CONVERSION_BUFFER_SIZE];
-    return unicode_case_operation(arg, PyUCS4_ToLower, buf, PyUCS4_CASE_CONVERSION_BUFFER_SIZE);
+    Py_UCS4 buf[PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE];
+    return unicode_case_operation(arg, PyUnstable_UCS4_ToLower,
+        buf, PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE);
 }
 
 
-/* Test PyUCS4_ToUpper() */
+/* Test PyUnstable_UCS4_ToUpper() */
 static PyObject *
 unicode_toupper(PyObject *self, PyObject *arg)
 {
-    Py_UCS4 buf[PyUCS4_CASE_CONVERSION_BUFFER_SIZE];
-    return unicode_case_operation(arg, PyUCS4_ToUpper, buf, PyUCS4_CASE_CONVERSION_BUFFER_SIZE);
+    Py_UCS4 buf[PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE];
+    return unicode_case_operation(arg, PyUnstable_UCS4_ToUpper,
+        buf, PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE);
 }
 
-/* Test PyUCS4_ToUpper() with a small buffer */
+/* Test PyUnstable_UCS4_ToUpper() with a small buffer */
 static PyObject *
 unicode_toupper_buffer_too_small(PyObject *self, PyObject *arg)
 {
     Py_UCS4 buf;
-    return unicode_case_operation(arg, PyUCS4_ToUpper, &buf, 1);
+    return unicode_case_operation(arg, PyUnstable_UCS4_ToUpper, &buf, 1);
 }
 
-/* Test PyUCS4_ToLower() */
+/* Test PyUnstable_UCS4_ToTitle() */
 static PyObject *
 unicode_totitle(PyObject *self, PyObject *arg)
 {
-    Py_UCS4 buf[PyUCS4_CASE_CONVERSION_BUFFER_SIZE];
-    return unicode_case_operation(arg, PyUCS4_ToTitle, buf, PyUCS4_CASE_CONVERSION_BUFFER_SIZE);
+    Py_UCS4 buf[PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE];
+    return unicode_case_operation(arg, PyUnstable_UCS4_ToTitle,
+        buf, PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE);
 }
 
-/* Test PyUCS4_ToLower() */
+/* Test PyUnstable_UCS4_ToFolded() */
 static PyObject *
 unicode_tofolded(PyObject *self, PyObject *arg)
 {
-    Py_UCS4 buf[PyUCS4_CASE_CONVERSION_BUFFER_SIZE];
-    return unicode_case_operation(arg, PyUCS4_ToFolded, buf, PyUCS4_CASE_CONVERSION_BUFFER_SIZE);
+    Py_UCS4 buf[PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE];
+    return unicode_case_operation(arg, PyUnstable_UCS4_ToFolded, buf, PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE);
 }
 
 

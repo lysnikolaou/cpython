@@ -328,7 +328,7 @@ These APIs can be used for fast direct character conversions:
    possible.  This function does not raise exceptions.
 
 
-.. c:function:: Py_ssize_t PyUCS4_ToLower(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
+.. c:function:: Py_ssize_t PyUnstable_UCS4_ToLower(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
 
    Convert *ch* to lower case, store result in *buffer*, which should be
    able to hold as many characters needed for *ch* to be lower cased, and
@@ -341,7 +341,7 @@ These APIs can be used for fast direct character conversions:
    .. versionadded:: next
 
 
-.. c:function:: Py_ssize_t PyUCS4_ToUpper(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
+.. c:function:: Py_ssize_t PyUnstable_UCS4_ToUpper(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
 
    Convert *ch* to upper case, store result in *buffer*, which should be
    able to hold as many characters needed for *ch* to be upper cased, and
@@ -354,7 +354,7 @@ These APIs can be used for fast direct character conversions:
    .. versionadded:: next
 
 
-.. c:function:: Py_ssize_t PyUCS4_ToTitle(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
+.. c:function:: Py_ssize_t PyUnstable_UCS4_ToTitle(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
 
    Convert *ch* to title case, store result in *buffer*, which should be
    able to hold as many characters needed for *ch* to be title cased, and
@@ -367,7 +367,7 @@ These APIs can be used for fast direct character conversions:
    .. versionadded:: next
 
 
-.. c:function:: Py_ssize_t PyUCS4_ToFolded(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
+.. c:function:: Py_ssize_t PyUnstable_UCS4_ToFolded(Py_UCS4 ch, Py_UCS4 *buffer, Py_ssize_t size)
 
    Foldcase *ch*, store result in *buffer*, which should be
    able to hold as many characters needed for *ch* to be foldcased, and
@@ -379,11 +379,12 @@ These APIs can be used for fast direct character conversions:
 
    .. versionadded:: next
 
-.. c:macro:: PyUCS4_CASE_CONVERSION_BUFFER_SIZE
+.. c:macro:: PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE
 
-   The minimum buffer size needed for any call to :c:func:`PyUCS4_ToLower`,
-   :c:func:`PyUCS4_ToUpper`, :c:func:`PyUCS4_ToTitle`, or
-   :c:func:`PyUCS4_ToFolded`. That is, ``3`` for Unicode 16.0.
+   The minimum buffer size needed for any call to
+   :c:func:`PyUnstable_UCS4_ToLower`, :c:func:`PyUnstable_UCS4_ToUpper`,
+   :c:func:`PyUnstable_UCS4_ToTitle`, or :c:func:`PyUnstable_UCS4_ToFolded`.
+   That is, ``3`` for Unicode 16.0.
 
 .. versionadded:: next
 

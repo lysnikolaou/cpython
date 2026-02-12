@@ -732,25 +732,25 @@ PyAPI_FUNC(int) _PyUnicode_IsAlpha(
     Py_UCS4 ch       /* Unicode character */
     );
 
-PyAPI_FUNC(Py_ssize_t) PyUCS4_ToLower(
+PyAPI_FUNC(Py_ssize_t) PyUnstable_UCS4_ToLower(
     Py_UCS4 ch,     /* Unicode character */
     Py_UCS4 *res,   /* Output buffer */
     Py_ssize_t size        /* Buffer size */
     );
 
-PyAPI_FUNC(Py_ssize_t) PyUCS4_ToUpper(
+PyAPI_FUNC(Py_ssize_t) PyUnstable_UCS4_ToUpper(
     Py_UCS4 ch,     /* Unicode character */
     Py_UCS4 *res,   /* Output buffer */
     Py_ssize_t size        /* Buffer size */
     );
 
-PyAPI_FUNC(Py_ssize_t) PyUCS4_ToTitle(
+PyAPI_FUNC(Py_ssize_t) PyUnstable_UCS4_ToTitle(
     Py_UCS4 ch,     /* Unicode character */
     Py_UCS4 *res,   /* Output buffer */
     Py_ssize_t size        /* Buffer size */
     );
 
-PyAPI_FUNC(Py_ssize_t) PyUCS4_ToFolded(
+PyAPI_FUNC(Py_ssize_t) PyUnstable_UCS4_ToFolded(
     Py_UCS4 ch,     /* Unicode character */
     Py_UCS4 *res,   /* Output buffer */
     Py_ssize_t size        /* Buffer size */
@@ -791,7 +791,7 @@ static inline int Py_UNICODE_ISSPACE(Py_UCS4 ch) {
 
 #define Py_UNICODE_ISALPHA(ch) _PyUnicode_IsAlpha(ch)
 
-#define PyUCS4_CASE_CONVERSION_BUFFER_SIZE 3
+#define PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE 3
 
 static inline int Py_UNICODE_ISALNUM(Py_UCS4 ch) {
    return (Py_UNICODE_ISALPHA(ch)
