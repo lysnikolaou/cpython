@@ -336,7 +336,7 @@ These APIs can be used for fast direct character conversions:
    is detected, an :exc:`ValueError` is raised and ``-1`` is returned.
 
    In Unicode 16.0, any character can be lowercased into a buffer of *size* ``2``.
-   See also :c:macro:`PyUCS4_CASE_CONVERSION_BUFFER_SIZE`.
+   See also :c:macro:`PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE`.
 
    .. versionadded:: next
 
@@ -349,7 +349,7 @@ These APIs can be used for fast direct character conversions:
    is detected, an :exc:`ValueError` is raised and ``-1`` is returned.
 
    In Unicode 16.0, any character can be uppercased into a buffer of *size* ``3``.
-   See also :c:macro:`PyUCS4_CASE_CONVERSION_BUFFER_SIZE`.
+   See also :c:macro:`PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE`.
 
    .. versionadded:: next
 
@@ -362,7 +362,7 @@ These APIs can be used for fast direct character conversions:
    is detected, an :exc:`ValueError` is raised and ``-1`` is returned.
 
    In Unicode 16.0, any character can be titlecased into a buffer of *size* ``3``.
-   See also :c:macro:`PyUCS4_CASE_CONVERSION_BUFFER_SIZE`.
+   See also :c:macro:`PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE`.
 
    .. versionadded:: next
 
@@ -375,7 +375,7 @@ These APIs can be used for fast direct character conversions:
    is detected, an :exc:`ValueError` is raised and ``-1`` is returned.
 
    In Unicode 16.0, any character can be foldcased into a buffer of *size* ``3``.
-   See also :c:macro:`PyUCS4_CASE_CONVERSION_BUFFER_SIZE`.
+   See also :c:macro:`PyUnstable_UCS4_CASE_CONVERSION_BUFFER_SIZE`.
 
    .. versionadded:: next
 
