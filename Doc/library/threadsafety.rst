@@ -111,11 +111,11 @@ atomic. For example:
 
    # NOT atomic: check-then-act
    if lst:
-      item = lst.pop()
+       item = lst.pop()
 
    # NOT thread-safe: iteration while modifying
    for item in lst:
-      process(item)  # another thread may modify lst
+       process(item)  # another thread may modify lst
 
 Consider external synchronization when sharing :class:`list` instances
 across threads.
@@ -227,11 +227,11 @@ atomic:
 
    # NOT atomic: check-then-act (TOCTOU)
    if key in d:
-      del d[key]
+       del d[key]
 
    # NOT thread-safe: iteration while modifying
    for key, value in d.items():
-      process(key)  # another thread may modify d
+       process(key)  # another thread may modify d
 
 To avoid time-of-check to time-of-use (TOCTOU) issues, use atomic
 operations or handle exceptions:
@@ -244,9 +244,9 @@ operations or handle exceptions:
 
    # Or handle the exception
    try:
-      del d[key]
+       del d[key]
    except KeyError:
-      pass
+       pass
 
 To safely iterate over a dictionary that may be modified by another
 thread, iterate over a copy:
@@ -256,7 +256,7 @@ thread, iterate over a copy:
 
    # Make a copy to iterate safely
    for key, value in d.copy().items():
-      process(key)
+       process(key)
 
 Consider external synchronization when sharing :class:`dict` instances
 across threads.
