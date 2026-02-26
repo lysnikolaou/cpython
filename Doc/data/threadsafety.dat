@@ -1,0 +1,17 @@
+# Thread safety annotations for C API functions.
+#
+# Each line has the form:
+#   function_name : level
+#
+# Where level is one of:
+#   incompatible -- not safe even with external locking
+#   compatible   -- safe if the caller serializes all access with external locks
+#   safe         -- safe for concurrent use
+#
+# Lines beginning with '#' are ignored.
+# The function name must match the C domain identifier used in the documentation.
+
+# Synchronization primitives (Doc/c-api/synchronization.rst)
+PyMutex_Lock:safe:
+PyMutex_Unlock:safe:
+PyMutex_IsLocked:safe:
