@@ -42,7 +42,7 @@ jobs:
             build_flags: --disable-gil
             run_tests: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -71,7 +71,7 @@ jobs:
           - target: aarch64-apple-darwin/clang
             runner: macos-14
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -110,7 +110,7 @@ jobs:
             runner: ubuntu-24.04-arm
             configure_flags: --with-pydebug
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6

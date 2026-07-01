@@ -64,7 +64,7 @@ jobs:
         run: |
           apt update && apt install git -yq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -101,7 +101,7 @@ jobs:
     needs: build-context
     if: needs.build-context.outputs.run-tests == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -283,7 +283,7 @@ jobs:
       SSLLIB_DIR: ${{ github.workspace }}/multissl/${{ matrix.ssllib.name }}/${{ matrix.ssllib.version }}
       LD_LIBRARY_PATH: ${{ github.workspace }}/multissl/${{ matrix.ssllib.name }}/${{ matrix.ssllib.version }}/lib
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         persist-credentials: false
     - name: Runner image version
@@ -342,7 +342,7 @@ jobs:
 
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Build and test
@@ -355,7 +355,7 @@ jobs:
     timeout-minutes: 60
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -387,7 +387,7 @@ jobs:
       OPENSSL_VER: 3.5.5
       PYTHONSTRICTEXTENSIONBUILD: 1
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         persist-credentials: false
     - name: Register gcc problem matcher
@@ -496,7 +496,7 @@ jobs:
       PYTHONSTRICTEXTENSIONBUILD: 1
       ASAN_OPTIONS: detect_leaks=0:allocator_may_return_null=1:handle_segv=0
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         persist-credentials: false
     - name: Runner image version
@@ -563,7 +563,7 @@ jobs:
     needs: build-context
     if: needs.build-context.outputs.run-ubuntu == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Runner image version
